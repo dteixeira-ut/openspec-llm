@@ -34,11 +34,11 @@ export default function App() {
   const progressPct = ((current + 1) / slides.length) * 100
 
   return (
-    <div className="stage-glow relative min-h-screen bg-[#0e0620] flex flex-col font-sans">
+    <div className="stage-glow relative min-h-screen bg-ut-navy-dark flex flex-col font-sans">
       {/* Top progress bar */}
       <div className="fixed top-0 left-0 right-0 h-1 z-50 bg-white/10">
         <div
-          className="h-full bg-gradient-to-r from-ut-purple via-ut-violet to-ut-indigo transition-all duration-500 ease-out"
+          className="h-full bg-gradient-to-r from-ut-navy via-ut-blue to-ut-teal transition-all duration-500 ease-out"
           style={{ width: `${progressPct}%` }}
         />
       </div>
@@ -61,7 +61,7 @@ export default function App() {
           <button
             onClick={() => setNotesOpen((o) => !o)}
             aria-label="Toggle speaker notes"
-            className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/50 hover:border-ut-purple hover:text-ut-purple transition-colors"
+            className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white/50 hover:border-ut-blue hover:text-ut-blue transition-colors"
           >
             {notesOpen ? 'Hide Notes' : 'Notes'}
           </button>

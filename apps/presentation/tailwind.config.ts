@@ -6,11 +6,12 @@ export default {
     extend: {
       colors: {
         ut: {
-          purple: '#6B3FA0',
-          'purple-dark': '#4E2D7A',
-          'purple-light': '#EDE7F6',
-          violet: '#7C3AED',
-          indigo: '#4338CA',
+          blue: '#315cfd',       // primary CTA / accent
+          navy: '#000d90',       // deep brand navy
+          'navy-dark': '#0c163d', // near-black navy for backgrounds
+          teal: '#28dcd1',       // accent / highlight
+          slate: '#415a79',      // secondary text
+          'blue-light': '#d0e0f7', // light blue tint for backgrounds
         },
       },
       fontFamily: {

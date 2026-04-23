@@ -16,7 +16,7 @@ function renderItem(item: ContentItem, index: number) {
       return (
         <p
           key={index}
-          className="text-ut-violet font-semibold text-xl animate-fade-up"
+          className="text-ut-blue font-semibold text-xl animate-fade-up"
           style={{ animationDelay: `${100 + index * 60}ms` }}
         >
           {item.content}
@@ -31,7 +31,7 @@ function renderItem(item: ContentItem, index: number) {
               className="flex items-start gap-3 text-gray-700 text-lg animate-fade-up"
               style={{ animationDelay: `${120 + i * 70}ms` }}
             >
-              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-br from-ut-purple to-ut-violet" />
+              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-br from-ut-blue to-ut-teal" />
               <span>{bullet}</span>
             </li>
           ))}
@@ -46,7 +46,7 @@ function renderItem(item: ContentItem, index: number) {
               className="flex items-start gap-3 text-gray-700 text-lg animate-fade-up"
               style={{ animationDelay: `${120 + i * 70}ms` }}
             >
-              <span className="shrink-0 font-bold text-ut-purple min-w-[1.5rem]">{i + 1}.</span>
+              <span className="shrink-0 font-bold text-ut-blue min-w-[1.5rem]">{i + 1}.</span>
               <span>{q}</span>
             </li>
           ))}
@@ -59,13 +59,12 @@ function renderItem(item: ContentItem, index: number) {
           className="rounded-xl overflow-hidden shadow-lg animate-fade-up"
           style={{ animationDelay: `${140 + index * 60}ms` }}
         >
-          {/* Terminal header */}
           <div className="flex items-center gap-1.5 bg-gray-800 px-4 py-2.5">
             <span className="h-3 w-3 rounded-full bg-red-500/80" />
             <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
             <span className="h-3 w-3 rounded-full bg-green-500/80" />
           </div>
-          <pre className="bg-gray-950 px-5 py-4 font-mono text-sm text-green-400 overflow-x-auto leading-relaxed">
+          <pre className="bg-gray-950 px-5 py-4 font-mono text-sm text-ut-teal overflow-x-auto leading-relaxed">
             <code>{item.content}</code>
           </pre>
         </div>
@@ -77,7 +76,7 @@ function renderItem(item: ContentItem, index: number) {
           href={item.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-ut-purple font-medium hover:text-ut-violet transition-colors underline underline-offset-2 animate-fade-up"
+          className="inline-flex items-center gap-1 text-ut-blue font-medium hover:text-ut-navy transition-colors underline underline-offset-2 animate-fade-up"
           style={{ animationDelay: `${140 + index * 60}ms` }}
         >
           {item.label}
@@ -90,7 +89,7 @@ function renderItem(item: ContentItem, index: number) {
           className="space-y-2 animate-fade-up"
           style={{ animationDelay: `${120 + index * 80}ms` }}
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-ut-purple/60">
+          <p className="text-xs font-bold uppercase tracking-widest text-ut-blue/60">
             {item.title}
           </p>
           <ul className="space-y-1">
@@ -100,7 +99,7 @@ function renderItem(item: ContentItem, index: number) {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ut-purple font-medium hover:text-ut-violet transition-colors underline underline-offset-2"
+                  className="text-ut-blue font-medium hover:text-ut-navy transition-colors underline underline-offset-2"
                 >
                   {link.label}
                 </a>
@@ -140,12 +139,11 @@ export function SlideCard({ slide, slideIndex }: SlideCardProps) {
       className="w-full max-w-4xl rounded-2xl bg-white shadow-2xl overflow-hidden animate-fade-up"
     >
       {/* Accent gradient bar */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-ut-purple via-ut-violet to-ut-indigo" />
+      <div className="h-1.5 w-full bg-gradient-to-r from-ut-navy via-ut-blue to-ut-teal" />
 
       <div className="p-10 md:p-14 space-y-6">
-        {/* Skill badge */}
         {skill && (
-          <span className="inline-block rounded-md bg-ut-purple-light px-3 py-1 font-mono text-xs font-semibold text-ut-purple tracking-wide animate-fade-up">
+          <span className="inline-block rounded-md bg-ut-blue-light px-3 py-1 font-mono text-xs font-semibold text-ut-navy tracking-wide animate-fade-up">
             Claude Code skill
           </span>
         )}
@@ -153,8 +151,8 @@ export function SlideCard({ slide, slideIndex }: SlideCardProps) {
         <h1
           className={`font-bold leading-tight animate-fade-up ${
             skill
-              ? 'font-mono text-3xl md:text-4xl text-ut-purple-dark'
-              : 'text-3xl md:text-4xl text-ut-purple'
+              ? 'font-mono text-3xl md:text-4xl text-ut-navy'
+              : 'text-3xl md:text-4xl text-ut-navy'
           }`}
           style={{ animationDelay: '40ms' }}
         >
