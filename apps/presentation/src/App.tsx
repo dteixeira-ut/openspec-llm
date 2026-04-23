@@ -66,6 +66,13 @@ export default function App() {
             {notesOpen ? 'Hide Notes' : 'Notes'}
           </button>
         </div>
+
+        {/* Logo watermark */}
+        <img
+          src="./usertesting-logo-white.svg"
+          alt="UserTesting"
+          className="opacity-25 w-28 mt-2"
+        />
       </div>
     </div>
   )
