@@ -71,7 +71,7 @@ This command operates ONLY on active changes in `openspec/changes/`. It NEVER mo
 
    | What's wrong                                    | Requirement exists in **main specs** | Requirement was **ADDED in this change** |
    | ----------------------------------------------- | ------------------------------------ | ---------------------------------------- |
-   | Spec gap (missing requirement)                  | ADDED to delta spec                  | N/A (it doesn't exist anywhere)          |
+   | Spec gap (missing requirement)                  | ADDED to delta spec                  | Add an ADDED block                       |
    | Spec ambiguity (requirement exists but unclear) | MODIFIED in delta spec               | Edit the ADDED block directly            |
    | Spec error (requirement is wrong)               | MODIFIED in delta spec               | Edit the ADDED block directly            |
    | Requirement shouldn't exist                     | REMOVED in delta spec                | Delete the ADDED block                   |
@@ -117,7 +117,7 @@ This command operates ONLY on active changes in `openspec/changes/`. It NEVER mo
 ### Code Fixed
 - <file>: <brief description>
 
-Continue with /opsx:apply.
+Resume /opsx:apply (or /opsx:archive if everything is complete).
 ```
 
 **Output (code-only fix)**
@@ -133,7 +133,7 @@ Continue with /opsx:apply.
 ### Code Fixed
 - <file>: <brief description>
 
-Spec validated — no spec update needed. Continue with /opsx:apply.
+Spec validated — no spec update needed. Resume /opsx:apply (or /opsx:archive if everything is complete).
 ```
 
 **Output (out of scope)**
