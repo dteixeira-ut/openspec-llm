@@ -222,6 +222,9 @@ This slide SHALL present the unresolved questions the team needs to answer befor
   3. What's the right scope for a "change"? One PR? One epic?
   4. How do we handle hotfixes and urgent work that can't follow the full workflow?
   5. How do we measure whether this is actually improving velocity or quality?
+  6. How do we maintain a healthy codebase instead of slop?
+  7. What will code reviews look like?
+  8. What should the limit on a commit be — do we go by tasks implemented?
 
 **Speaker notes:** "These are the questions we need to answer as a team — not questions Claude can answer for us. I'd love to spend the last part of this conversation on these, because how we answer them will determine whether this workflow helps us or becomes another process we abandon after three months."
 

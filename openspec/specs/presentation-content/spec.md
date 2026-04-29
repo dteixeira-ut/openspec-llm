@@ -175,6 +175,9 @@ This slide SHALL surface unresolved questions framed to invite discussion.
   3. What's the right scope for a "change"? One PR? One epic?
   4. How do we handle hotfixes and urgent work that can't follow the full workflow?
   5. How do we measure whether this is actually improving velocity or quality?
+  6. How do we maintain a healthy codebase instead of slop?
+  7. What will code reviews look like?
+  8. What should the limit on a commit be — do we go by tasks implemented?
 
 #### Scenario: Open questions slide matches storyboard
 - **WHEN** the user advances to the open questions slide
