@@ -197,7 +197,10 @@ export const slides: Slide[] = [
         type: 'bullets',
         items: [
           'Overhead for small or urgent changes — not every fix needs the full workflow',
-          'Specs can drift from code if the archive step is skipped',
+          'Specs can drift from code at any stage — imprecise specs require mid-implementation fixes, and refinements before or after archive may not flow back into the spec library',
+          'Specs are substantially more verbose than the resulting code — difficult to review thoroughly without AI assistance',
+          'Even well-scoped changes may need code refinement post-generation — "it works" is not the same as "it works well"',
+          'Requires strong guardrails, code pattern guidelines, and feedback loops to maintain output quality over time',
           'LLM outputs still need careful human review — trust but verify',
           'Workflow has a learning curve; team buy-in required',
           'Tooling is early-stage — rough edges exist',
@@ -212,16 +215,36 @@ export const slides: Slide[] = [
     title: 'Open Questions',
     body: [
       {
-        type: 'numbered',
+        type: 'numbered-with-subitems',
         items: [
-          'How do we keep specs in sync as code evolves post-archive?',
-          'Who owns the spec review process — and what does approval look like?',
-          'What\'s the right scope for a "change"? One PR? One epic?',
-          "How do we handle hotfixes and urgent work that can't follow the full workflow?",
-          'How do we measure whether this is actually improving velocity or quality?',
-          'How do we maintain a healthy codebase instead of slop?',
-          'What will code reviews look like?',
-          'What should the limit on a commit be — do we go by tasks implemented?',
+          { question: 'How do we keep specs in sync as code evolves post-archive?' },
+          { question: 'Who owns the spec review process — and what does approval look like?' },
+          { question: 'What\'s the right scope for a "change"? One PR? One epic?' },
+          { question: "How do we handle hotfixes and urgent work that can't follow the full workflow?" },
+          { question: 'How do we measure whether this is actually improving velocity or quality?' },
+          { question: 'How do we maintain a healthy codebase instead of slop?' },
+          { question: 'What will code reviews look like?' },
+          { question: 'What should the limit on a commit be — do we go by tasks implemented?' },
+          {
+            question: 'What will the end-to-end development flow look like?',
+            subitems: [
+              {
+                label: 'Propose',
+                content: 'How can we efficiently review specs before apply without becoming a bottleneck?',
+              },
+              {
+                label: 'Apply',
+                content: 'How can we efficiently auto-validate as much as possible? Can we include an adversarial code-review step?',
+                link: { label: 'adversarial code-review', href: 'https://asdlc.io/patterns/adversarial-code-review/' },
+              },
+              {
+                label: 'Validation',
+                content: 'Human validation → refinement → archive — what is the correct approach? (e.g. after a PR comment, via /opsx:refine)',
+              },
+            ],
+          },
+          { question: 'Should we add branch protection rules to block unarchived changes from merging to main?' },
+          { question: '(Hypothetical) How do we resolve git merge conflicts on spec archives when two changes modify the same capability?' },
         ],
       },
     ],

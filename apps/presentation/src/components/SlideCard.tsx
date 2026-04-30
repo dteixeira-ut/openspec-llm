@@ -1,4 +1,23 @@
-import type { ContentItem, Slide } from '../types'
+import type { ContentItem, Slide, SubItem } from '../types'
+
+function renderWithLink(content: string, link: { label: string; href: string }) {
+  const idx = content.indexOf(link.label)
+  if (idx === -1) return content
+  return (
+    <>
+      {content.slice(0, idx)}
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-ut-blue underline underline-offset-2 hover:text-ut-navy transition-colors"
+      >
+        {link.label}
+      </a>
+      {content.slice(idx + link.label.length)}
+    </>
+  )
+}
 
 function renderItem(item: ContentItem, index: number) {
   switch (item.type) {
@@ -48,6 +67,40 @@ function renderItem(item: ContentItem, index: number) {
             >
               <span className="shrink-0 font-bold text-ut-blue min-w-[1.5rem]">{i + 1}.</span>
               <span>{q}</span>
+            </li>
+          ))}
+        </ol>
+      )
+    case 'numbered-with-subitems':
+      return (
+        <ol key={index} className="space-y-3">
+          {item.items.map((entry, i) => (
+            <li
+              key={i}
+              className="flex flex-col gap-1 text-gray-700 text-lg animate-fade-up"
+              style={{ animationDelay: `${120 + i * 70}ms` }}
+            >
+              <div className="flex items-start gap-3">
+                <span className="shrink-0 font-bold text-ut-blue min-w-[1.5rem]">{i + 1}.</span>
+                <span>{entry.question}</span>
+              </div>
+              {entry.subitems && entry.subitems.length > 0 && (
+                <ul className="ml-9 mt-1 space-y-1">
+                  {entry.subitems.map((sub: SubItem, j: number) => (
+                    <li key={j} className="flex items-start gap-2 text-base text-gray-600">
+                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-ut-teal" />
+                      <span>
+                        {sub.label && (
+                          <span className="font-semibold text-ut-navy">{sub.label}: </span>
+                        )}
+                        {sub.link
+                          ? renderWithLink(sub.content, sub.link)
+                          : sub.content}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ol>
