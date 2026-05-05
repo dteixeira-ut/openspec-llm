@@ -86,7 +86,7 @@ Implement tasks from an OpenSpec change.
 
    When all tasks are complete (all checkboxes `[x]`, or `state: "all_done"` from CLI):
 
-   Use the **Skill tool** to invoke `review`, passing the change name as context: "Review implementation of change '<name>'."
+   Use the **Skill tool** to invoke `opsx:review`, passing the change name as context: "Review implementation of change '<name>'."
 
    Display the full review result inline.
 
