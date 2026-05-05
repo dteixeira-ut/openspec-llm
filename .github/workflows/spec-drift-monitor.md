@@ -6,15 +6,12 @@ description: |
   to the PR author so nothing slips through unnoticed after merge.
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize]
   push:
     branches: [main]
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
   issues: write
 
 tools:
@@ -23,15 +20,11 @@ tools:
     min-integrity: none
 
 safe-outputs:
-  add-comment:
-    max: 1
-    hide-older-comments: true
   create-issue:
     title-prefix: "[spec-drift] "
     labels: [spec-drift]
   messages:
-    footer: "> Informational only — this check never blocks merges."
-    run-started: "Analyzing spec drift..."
+    run-started: "Analyzing spec drift after merge..."
     run-success: "Spec drift analysis complete."
     run-failure: "Spec drift analysis could not complete: {status}"
 ---
@@ -78,13 +71,9 @@ If no specs exist or the directory is empty, call `noop`:
 
 ### Step 2: Get the code diff
 
-**On a pull request** (event: `pull_request`):
-- Fetch the diff for PR #${{ github.event.pull_request.number }}
-- Ignore files under `openspec/`, `*.lock`, and `*.json`
-
-**On a push to main** (event: `push`):
-- Fetch the diff between commits `${{ github.event.before }}` and `${{ github.event.after }}`
-- Ignore files under `openspec/`, `*.lock`, and `*.json`
+Fetch the diff between commits `${{ github.event.before }}` and
+`${{ github.event.after }}`. Ignore files under `openspec/`, `*.lock`,
+and `*.json`.
 
 If the diff is empty after excluding those paths, call `noop`:
 > "No relevant code changes detected."
@@ -96,11 +85,6 @@ one of: ALIGNED, DRIFTED, MISSING, or UNRELATED. Omit UNRELATED rows entirely.
 
 ### Step 4: Act on the results
 
-**On a pull request:**
-Post the drift report as a comment on PR #${{ github.event.pull_request.number }}
-using `add-comment`. This is informational — never request changes, never block.
-
-**On a push to main:**
 1. Parse the merge commit message (`${{ github.event.head_commit.message }}`) to
    extract the PR number — GitHub merge commits follow the format
    `Merge pull request #N from ...`
