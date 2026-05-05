@@ -18,3 +18,18 @@ schema: spec-driven
 #       - Always include a "Non-goals" section
 #     tasks:
 #       - Break tasks into chunks of max 2 hours
+
+# Post-command hooks
+# Commands listed here run automatically after the named lifecycle event.
+# /opsx:archive reads this section and executes each entry after archiving.
+hooks:
+  post-archive:
+    - /opsx:summarize
+
+# AI agents configuration
+# pr-reviewers: list of AI agents to mention when creating a PR via /opsx:pr.
+# Add "codex" or "claude" to the list to include them in review requests.
+# The polling loop in /opsx:pr watches for responses from any agent in this list.
+agents:
+  pr-reviewers:
+    - cursor

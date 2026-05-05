@@ -84,8 +84,18 @@ Implement tasks from an OpenSpec change.
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
    - If paused: explain why and wait for guidance
+
+8. **Auto-review on completion**
+
+   When all tasks are complete (all checkboxes `[x]`):
+
+   Run a code review — get the git diff, load context files (tasks.md, design.md, specs), assess task coverage and code quality, and return a decision.
+
+   Display the full review result inline.
+
+   - If `APPROVED` → suggest archiving as the next step
+   - If `CHANGES REQUESTED` → show the issues clearly, do **not** suggest archive, wait for guidance
 
 **Output During Implementation**
 

@@ -1,0 +1,129 @@
+name: Spec Drift Monitor
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  models: read
+
+jobs:
+  spec-drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for spec files
+        id: check-specs
+        run: |
+          if [ -d "openspec/specs" ] && [ "$(ls -A openspec/specs 2>/dev/null)" ]; then
+            echo "has_specs=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_specs=false" >> $GITHUB_OUTPUT
+            echo "No spec files found in openspec/specs/ — skipping drift check."
+          fi
+
+      - name: Gather specs and diff
+        if: steps.check-specs.outputs.has_specs == 'true'
+        id: gather
+        run: |
+          SPECS=$(find openspec/specs -name "spec.md" -exec sh -c 'echo "=== $1 ==="; cat "$1"' _ {} \; 2>/dev/null)
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            DIFF=$(git diff origin/${{ github.base_ref }}...HEAD \
+              -- . ':(exclude)openspec/' ':(exclude)*.lock' ':(exclude)*.json' \
+              2>/dev/null | head -c 12000)
+          else
+            DIFF=$(git diff HEAD~1 HEAD \
+              -- . ':(exclude)openspec/' ':(exclude)*.lock' ':(exclude)*.json' \
+              2>/dev/null | head -c 12000)
+          fi
+
+          printf '%s' "$SPECS" > /tmp/specs.txt
+          printf '%s' "$DIFF" > /tmp/diff.txt
+
+      - name: Analyze drift via GitHub Models
+        if: steps.check-specs.outputs.has_specs == 'true'
+        id: analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SPECS=$(cat /tmp/specs.txt)
+          DIFF=$(cat /tmp/diff.txt)
+
+          PROMPT="You are a spec drift analyzer for a spec-driven development project.
+
+Review the following OpenSpec capability specs and the code diff. For each capability spec, determine if the code changes align with, diverge from, or are unrelated to the spec requirements.
+
+SPECS:
+${SPECS}
+
+CODE DIFF:
+${DIFF}
+
+Produce a concise markdown report in this exact format:
+
+## Spec Drift Report
+
+| Capability | Status | Notes |
+|-----------|--------|-------|
+| <name> | ALIGNED / DRIFTED / MISSING / UNRELATED | <brief explanation, max 15 words> |
+
+**Summary:** <1-2 sentences about the overall drift state>
+
+Status definitions:
+- ALIGNED: code change implements or is consistent with the spec
+- DRIFTED: code change contradicts or diverges from the spec
+- MISSING: spec requirement has no corresponding implementation in the diff
+- UNRELATED: code change does not touch this capability
+
+Only list DRIFTED or MISSING capabilities if the diff contains no related changes.
+Keep the report concise — skip UNRELATED capabilities if there are more than 3."
+
+          PAYLOAD=$(jq -n \
+            --arg model "gpt-4o-mini" \
+            --arg prompt "$PROMPT" \
+            '{model: $model, messages: [{role: "user", content: $prompt}], max_tokens: 800}')
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            https://models.inference.ai.azure.com/chat/completions \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          if [ "$HTTP_CODE" = "200" ] && echo "$BODY" | jq -e '.choices[0].message.content' > /dev/null 2>&1; then
+            echo "$BODY" | jq -r '.choices[0].message.content' > /tmp/report.txt
+            echo "report_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "report_available=false" >> $GITHUB_OUTPUT
+            echo "GitHub Models API returned HTTP $HTTP_CODE — Copilot access may be required." >&2
+          fi
+
+      - name: Post drift report as PR comment
+        if: >
+          github.event_name == 'pull_request' &&
+          steps.check-specs.outputs.has_specs == 'true' &&
+          steps.analyze.outputs.report_available == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPORT=$(cat /tmp/report.txt)
+
+          COMMENT="<!-- spec-drift-monitor -->
+${REPORT}
+
+---
+> Informational only — this check never blocks merges. Analysis powered by [GitHub Models](https://github.com/marketplace/models)."
+
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "$COMMENT" \
+            --repo ${{ github.repository }}

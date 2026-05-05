@@ -63,29 +63,44 @@ Archive a completed change in the experimental workflow.
 
 5. **Perform the archive**
 
-   Create the archive directory if it doesn't exist:
+   **Extract the ticket ID from the current git branch:**
    ```bash
-   mkdir -p openspec/changes/archive
+   git rev-parse --abbrev-ref HEAD
+   ```
+   Parse the branch name for a Jira ticket ID matching `RAD-\d+` (e.g., `dteixeira-ut/feature/RAD-123/add-auth` → `RAD-123`).
+
+   - If a ticket ID is found: use it as the parent folder
+   - If no ticket ID is found: use **AskUserQuestion** — "No ticket ID found in branch name (`<branch>`). Enter a ticket ID (e.g. RAD-123) or press Enter to use `misc/`." Use `misc` if the user skips.
+
+   **Create the archive directory and move the change:**
+   ```bash
+   TICKET=<extracted-ticket-or-misc>
+   mkdir -p openspec/changes/archive/$TICKET
+
+   # Check if target already exists
+   # If openspec/changes/archive/$TICKET/<name>/ exists → show error (see Output On Error)
+   # Otherwise:
+   mv openspec/changes/<name> openspec/changes/archive/$TICKET/<name>
    ```
 
-   Generate target name using current date: `YYYY-MM-DD-<change-name>`
-
-   **Check if target already exists:**
-   - If yes: Fail with error, suggest renaming existing archive or using different date
-   - If no: Move the change directory to archive
-
-   ```bash
-   mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
-   ```
+   Archive path: `openspec/changes/archive/<TICKET>/<change-name>/`
 
 6. **Display summary**
 
    Show archive completion summary including:
    - Change name
    - Schema that was used
-   - Archive location
+   - Archive location (using ticket-scoped path)
    - Spec sync status (synced / sync skipped / no delta specs)
    - Note about any warnings (incomplete artifacts/tasks)
+
+7. **Execute post-archive hooks**
+
+   Read `openspec/config.yaml`. If a `hooks.post-archive` list exists, execute each entry in order.
+
+   For `/opsx:summarize`: use the **Skill tool** to invoke `opsx:summarize`, passing the archived change name. Show the summary output inline below the archive completion summary.
+
+   If config.yaml cannot be read or no hooks are defined, skip silently.
 
 **Output On Success**
 
@@ -94,7 +109,8 @@ Archive a completed change in the experimental workflow.
 
 **Change:** <change-name>
 **Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
+**Ticket:** <TICKET>
+**Archived to:** openspec/changes/archive/<TICKET>/<change-name>/
 **Specs:** ✓ Synced to main specs
 
 All artifacts complete. All tasks complete.
@@ -107,7 +123,8 @@ All artifacts complete. All tasks complete.
 
 **Change:** <change-name>
 **Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
+**Ticket:** <TICKET>
+**Archived to:** openspec/changes/archive/<TICKET>/<change-name>/
 **Specs:** No delta specs
 
 All artifacts complete. All tasks complete.
@@ -120,7 +137,8 @@ All artifacts complete. All tasks complete.
 
 **Change:** <change-name>
 **Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
+**Ticket:** <TICKET>
+**Archived to:** openspec/changes/archive/<TICKET>/<change-name>/
 **Specs:** Sync skipped (user chose to skip)
 
 **Warnings:**
@@ -137,14 +155,14 @@ Review the archive if this was not intentional.
 ## Archive Failed
 
 **Change:** <change-name>
-**Target:** openspec/changes/archive/YYYY-MM-DD-<name>/
+**Target:** openspec/changes/archive/<TICKET>/<change-name>/
 
-Target archive directory already exists.
+Target archive directory already exists for this ticket.
 
 **Options:**
-1. Rename the existing archive
+1. Rename the existing archive to distinguish the two
 2. Delete the existing archive if it's a duplicate
-3. Wait until a different date to archive
+3. Archive under a different ticket ID
 ```
 
 **Guardrails**

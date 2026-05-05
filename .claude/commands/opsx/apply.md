@@ -80,8 +80,18 @@ Implement tasks from an OpenSpec change.
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
    - If paused: explain why and wait for guidance
+
+8. **Auto-review on completion**
+
+   When all tasks are complete (all checkboxes `[x]`, or `state: "all_done"` from CLI):
+
+   Use the **Skill tool** to invoke `opsx:review`, passing the change name as context: "Review implementation of change '<name>'."
+
+   Display the full review result inline.
+
+   - If `APPROVED` → suggest `/opsx:archive` as the next step
+   - If `CHANGES REQUESTED` → show the issues clearly, do **not** suggest archive, wait for guidance
 
 **Output During Implementation**
 
