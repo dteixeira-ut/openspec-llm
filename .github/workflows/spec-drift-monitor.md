@@ -84,16 +84,17 @@ one of: ALIGNED, DRIFTED, MISSING, or UNRELATED. Omit UNRELATED rows entirely.
 
 ### Step 4: Act on the results
 
-1. Parse the merge commit message (`${{ github.event.head_commit.message }}`) to
-   extract the PR number — GitHub merge commits follow the format
-   `Merge pull request #N from ...`
-2. If a PR number is found, use the GitHub tools to get the PR author's login.
-3. **If the report contains any DRIFTED or MISSING rows:**
+1. Use the GitHub tools to fetch the commit details for `${{ github.event.head_commit.id }}`
+   in repository `${{ github.repository }}`. From the commit, read the commit message
+   and construct the commit URL as `${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.head_commit.id }}`.
+2. Parse the commit message to extract the PR number — GitHub merge commits follow
+   the format `Merge pull request #N from ...`
+3. If a PR number is found, use the GitHub tools to get the PR author's login.
+4. **If the report contains any DRIFTED or MISSING rows:**
    Create a GitHub issue with:
    - Title: `Spec drift detected after #<PR-number> merged`
-   - Body: the drift table, a link to the merge commit
-     (`${{ github.event.head_commit.url }}`), and the note:
-     "Address these items to keep specs and code aligned."
+   - Body: the drift table, a link to the merge commit (constructed URL from step 1),
+     and the note: "Address these items to keep specs and code aligned."
    - Assign to the PR author's GitHub login
-4. **If no drift was detected:** call `noop`:
+5. **If no drift was detected:** call `noop`:
    > "No spec drift detected after merge — no issue needed."
