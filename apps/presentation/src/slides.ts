@@ -60,7 +60,8 @@ export const slides: Slide[] = [
     body: [
       {
         type: 'subheading',
-        content: 'A CLI + four Claude Code skills that cover the full development lifecycle',
+        content:
+          'A CLI + Claude Code skills covering the full lifecycle, plus CI automation that closes the loop',
       },
       {
         type: 'bullets',
@@ -73,11 +74,28 @@ export const slides: Slide[] = [
       {
         type: 'code',
         content:
-          '/opsx:propose  →  plan the change\n/opsx:explore  →  investigate before committing\n/opsx:apply    →  implement with full context\n/opsx:archive  →  close the loop',
+          'Plan         /opsx:propose   /opsx:explore   /opsx:suggest\nBuild        /opsx:apply     /opsx:refine    /opsx:review\nShip/Close   /opsx:pr        /opsx:archive   /opsx:summarize',
       },
     ],
     notes:
-      "OpenSpec has two parts. The CLI manages the artifact structure on disk. The Claude Code skills are what you actually interact with — they're slash commands that tell Claude which phase of the workflow you're in, fetch the right instructions from the CLI, and load the right context files. The result is that Claude always knows where you are in the process and what it should be doing.",
+      "OpenSpec has two parts. The CLI manages the artifact structure on disk. The Claude Code skills are what you actually interact with — they're slash commands that tell Claude which phase of the workflow you're in, fetch the right instructions from the CLI, and load the right context files. The result is that Claude always knows where you are in the process and what it should be doing. We'll walk through them grouped into three phases — Plan, Build, Ship & Close.",
+  },
+  {
+    id: 'phase-plan',
+    title: 'Plan',
+    body: [
+      {
+        type: 'subheading',
+        content: 'Decide what to build, and why, before writing code',
+      },
+      {
+        type: 'text',
+        content:
+          'Three skills cover this phase. Propose turns an idea into a fully-specified change. Explore is the thinking-partner mode for when an idea isn\'t ready to commit yet. Suggest stress-tests an active change before you start building it. Different shapes of "figure out what we\'re actually doing" — all read-only with respect to your codebase.',
+      },
+    ],
+    notes:
+      "The Plan phase is where the hard thinking happens. The cost of a bad spec is paid every line of code afterward, so we treat this phase as cheap relative to what comes next. None of these three skills modify your codebase — they're shaping the change before you commit to it.",
   },
   {
     id: 'skill-propose',
@@ -128,6 +146,45 @@ export const slides: Slide[] = [
       "Explore mode is different from all the other skills — it's a stance, not a workflow. There are no required steps and no mandatory output. Use it when you're not sure what to build yet, when an approach has turned out to be more complex than expected mid-implementation, or when you want a second opinion before committing to a design decision. Claude reads existing change artifacts if they exist, so it can ground the conversation in what's already been decided.",
   },
   {
+    id: 'skill-suggest',
+    title: '/opsx:suggest',
+    body: [
+      {
+        type: 'subheading',
+        content: 'Stress-test the change before you start building',
+      },
+      {
+        type: 'bullets',
+        items: [
+          'Reads proposal, design, specs, and tasks for an active change',
+          'Produces a structured insights report: risks, gaps, improvements, open questions',
+          'Hands off to explore mode pre-seeded with the findings',
+          'Read-only — never modifies any artifact',
+        ],
+      },
+      { type: 'code', content: '/opsx:suggest <change-name>' },
+    ],
+    notes:
+      "Suggest is the bridge between propose and apply. After you've written a proposal, design, and specs, it's tempting to just start coding — but the most expensive bugs in spec-driven development are the ones that live in the spec itself. Suggest reads everything you wrote, looks for risks, gaps, and ambiguities, and pre-seeds an explore session so you can think through the issues before code locks them in. Use it whenever a change feels ambitious or touches code you don't fully control.",
+  },
+  {
+    id: 'phase-build',
+    title: 'Build',
+    body: [
+      {
+        type: 'subheading',
+        content: 'Implement with context, refine when reality diverges, review before shipping',
+      },
+      {
+        type: 'text',
+        content:
+          'Three skills cover this phase. Apply works the task checklist with full artifact context. Refine handles the moments when implementation reveals the spec was wrong. Review audits the diff against specs and tasks before you open a PR. The methodical implementation loop.',
+      },
+    ],
+    notes:
+      "The Build phase is where the artifacts you wrote in Plan turn into working code. The key shift here is that Claude isn't guessing at intent — it's executing against a contract. When the contract is wrong, refine. When the work is done, review. Both are part of the build, not separate ceremonies.",
+  },
+  {
     id: 'skill-apply',
     title: '/opsx:apply',
     body: [
@@ -150,6 +207,89 @@ export const slides: Slide[] = [
       "This is where the payoff happens. When you run apply, Claude isn't starting from a blank chat — it has read everything. The why from the proposal, the architectural decisions from design, the requirements from the specs. It works methodically through the task list, marks each checkbox done, and stops if it hits something unclear rather than guessing. The quality difference compared to a context-free 'write me some code' is significant, especially for complex or cross-cutting changes.",
   },
   {
+    id: 'skill-refine',
+    title: '/opsx:refine',
+    body: [
+      {
+        type: 'subheading',
+        content: 'When implementation reveals a spec gap, refine instead of work around it',
+      },
+      {
+        type: 'bullets',
+        items: [
+          'Use when the spec is wrong, ambiguous, or missing a case discovered during apply',
+          'Updates the relevant delta spec and the implementing code in the same change',
+          'Keeps the spec the source of truth — no silent code/spec divergence',
+          'Logs the refinement so reviewers can see what shifted between propose and ship',
+        ],
+      },
+      { type: 'code', content: '/opsx:refine' },
+    ],
+    notes:
+      "Refine exists because no spec survives contact with implementation perfectly. The dangerous moment is when an engineer realizes the spec doesn't match reality and quietly works around it — now the code does what's needed, but the spec is fiction. Refine forces the inverse: you fix the spec first, the code follows, and the change record shows exactly what was learned during build. It's the cheapest way to keep specs honest.",
+  },
+  {
+    id: 'skill-review',
+    title: '/opsx:review',
+    body: [
+      {
+        type: 'subheading',
+        content: 'Catch drift between specs, tasks, and the code you just wrote',
+      },
+      {
+        type: 'bullets',
+        items: [
+          "Reads the change's specs and tasks, then audits the git diff",
+          'Flags missing scenarios, unimplemented tasks, and spec/code drift',
+          'Returns a structured verdict — APPROVED or CHANGES REQUESTED',
+          'Run before opening a PR; complements the mandatory code-review subagent gate',
+        ],
+      },
+      { type: 'code', content: '/opsx:review' },
+    ],
+    notes:
+      "Review is the moment of truth before the PR. It loads everything you wrote — specs, tasks, design — and asks one question of the diff: does the code actually do what the spec said? Missing scenarios, unfinished tasks, accidental drift — all surfaced before a human reviewer ever sees the PR. Pair it with the code-review subagent gate (which CLAUDE.md runs after every implementation) and most spec drift never makes it past your local branch.",
+  },
+  {
+    id: 'phase-ship-close',
+    title: 'Ship & Close',
+    body: [
+      {
+        type: 'subheading',
+        content: 'Open the PR, sync specs into the library, leave a summary for next time',
+      },
+      {
+        type: 'text',
+        content:
+          'Three skills cover this phase. PR creates the pull request and kicks off AI review. Archive syncs delta specs into the living library so future changes can read them. Summarize leaves a human-readable record of what shipped. This is where each change becomes context for the next.',
+      },
+    ],
+    notes:
+      "The Ship & Close phase is where most of the compounding value of this workflow comes from. Skip it and you're back to starting from zero every time. The friction is intentionally low — three short steps — because if any of them feel expensive, teams will skip them under deadline pressure and the spec library will go stale.",
+  },
+  {
+    id: 'skill-pr',
+    title: '/opsx:pr',
+    body: [
+      {
+        type: 'subheading',
+        content: 'PR creation + AI reviewer integration in one step',
+      },
+      {
+        type: 'bullets',
+        items: [
+          "Drafts a PR description from the change's proposal and design",
+          'Opens the PR using the repository template',
+          'Posts an AI reviewer comment and polls for the response (current implementation: @cursor)',
+          "Decouples PR mechanics from the developer's flow so review can start immediately",
+        ],
+      },
+      { type: 'code', content: '/opsx:pr' },
+    ],
+    notes:
+      "PR is the handoff between local work and shared review. It writes a description by reading the proposal and design — so the PR body is grounded in the same artifacts the code is grounded in — opens the PR using the repository template, and immediately invokes an AI reviewer to start a parallel pass. The AI reviewer is currently `@cursor`, but the skill is reviewer-agnostic; swapping it out is a one-line change. The point is that human review never has to wait on the AI's first pass.",
+  },
+  {
     id: 'skill-archive',
     title: '/opsx:archive',
     body: [
@@ -170,6 +310,49 @@ export const slides: Slide[] = [
     ],
     notes:
       "Archive is easy to skip — the code works, ship it. But this is where the compounding value of spec-driven development comes from. The specs you wrote get merged into a living library. Every future change Claude works on has access to the decisions this team made. Skip archive consistently and you're back to starting from zero every time. The friction is low — one command, one review, done.",
+  },
+  {
+    id: 'skill-summarize',
+    title: '/opsx:summarize',
+    body: [
+      {
+        type: 'subheading',
+        content: 'Leave a short, human-readable record of every archived change',
+      },
+      {
+        type: 'bullets',
+        items: [
+          'Runs against an archived change folder',
+          'Generates summary.md with the why, what changed, and how it shipped',
+          'Optimized for skimming weeks or months later, not for compliance',
+          'Compounding value: future explore sessions read these summaries for context',
+        ],
+      },
+      { type: 'code', content: '/opsx:summarize' },
+    ],
+    notes:
+      "Specs are precise but not fast to read. Summarize fills that gap. After archive, it produces a one-page narrative — why we did this, what changed, what we learned — that anyone can skim. Six months from now, when someone is debugging code that used to belong to this change, they'll find the summary first and the spec second. Both are useful for different questions.",
+  },
+  {
+    id: 'closing-loop-ci',
+    title: 'Closing the loop in CI',
+    body: [
+      {
+        type: 'subheading',
+        content: "What runs automatically, so the human loop doesn't have to",
+      },
+      {
+        type: 'bullets',
+        items: [
+          'Code Review Gate — CLAUDE.md mandates a code-review subagent run after every implementation, before results are presented',
+          'Spec Drift Monitor — a gh-aw workflow runs on merge to main; if code diverges from the living specs, it opens a GitHub issue assigned to the PR author',
+          'AI PR Reviewer — invoked by /opsx:pr, posts a comment on the PR and is polled for response (current implementation: @cursor)',
+          "Together: every change is reviewed before merge, drift is surfaced after merge, and the developer never has to remember to run any of it",
+        ],
+      },
+    ],
+    notes:
+      "The skills we just walked through are interactive — a developer invokes them. These three pieces are the opposite: they run on their own, and their job is to catch the things humans skip under pressure. The Code Review Gate makes review non-optional inside Claude Code. The Spec Drift Monitor makes drift surfaceable after merge, so we can't quietly ship code that contradicts the specs. The AI PR Reviewer kicks off a fresh-eyes pass before a human even opens the PR. None of this replaces human judgment — it just removes the failure modes where the workflow gets skipped.",
   },
   {
     id: 'pros',
@@ -217,29 +400,38 @@ export const slides: Slide[] = [
       {
         type: 'numbered-with-subitems',
         items: [
-          { question: 'How do we keep specs in sync as code evolves post-archive?' },
+          {
+            question:
+              'How do we keep specs in sync as code evolves post-archive? Partially answered: the spec drift monitor runs on merge to main and opens a GitHub issue when it detects drift. Open: who owns fixing flagged drift, and on what SLA?',
+          },
           { question: 'Who owns the spec review process — and what does approval look like?' },
           { question: 'What\'s the right scope for a "change"? One PR? One epic?' },
           { question: "How do we handle hotfixes and urgent work that can't follow the full workflow?" },
           { question: 'How do we measure whether this is actually improving velocity or quality?' },
           { question: 'How do we maintain a healthy codebase instead of slop?' },
-          { question: 'What will code reviews look like?' },
+          {
+            question:
+              'What will code reviews look like? Partially answered: the code-review subagent gate runs after every implementation, and /opsx:pr posts an AI reviewer comment on the PR. Open: how adversarial should the AI review go, and where do humans still own the call?',
+          },
           { question: 'What should the limit on a commit be — do we go by tasks implemented?' },
           {
             question: 'What will the end-to-end development flow look like?',
             subitems: [
               {
                 label: 'Propose',
-                content: 'How can we efficiently review specs before apply without becoming a bottleneck?',
+                content:
+                  'Partially answered: /opsx:suggest surfaces risks and gaps before apply. Open: when does suggest suffice, and when is human spec review still required?',
               },
               {
                 label: 'Apply',
-                content: 'How can we efficiently auto-validate as much as possible? Can we include an adversarial code-review step?',
+                content:
+                  'How can we efficiently auto-validate as much as possible? Can we include an adversarial code-review step?',
                 link: { label: 'adversarial code-review', href: 'https://asdlc.io/patterns/adversarial-code-review/' },
               },
               {
                 label: 'Validation',
-                content: 'Human validation → refinement → archive — what is the correct approach? (e.g. after a PR comment, via /opsx:refine)',
+                content:
+                  'Human validation → refinement → archive — what is the correct approach? (e.g. after a PR comment, via /opsx:refine)',
               },
             ],
           },
@@ -249,7 +441,7 @@ export const slides: Slide[] = [
       },
     ],
     notes:
-      "These are the questions we need to answer as a team — not questions Claude can answer for us. I'd love to spend the last part of this conversation on these, because how we answer them will determine whether this workflow helps us or becomes another process we abandon after three months.",
+      "These are the questions we need to answer as a team — not questions Claude can answer for us. Three of them are now partially answered by tooling we've added since the first version of this deck — drift monitor, code-review gate, suggest — but each still has a real open question attached. I'd love to spend the last part of this conversation on these, because how we answer them will determine whether this workflow helps us or becomes another process we abandon after three months.",
   },
   {
     id: 'resources',
@@ -289,10 +481,11 @@ export const slides: Slide[] = [
       },
       {
         type: 'footer',
-        content: 'This deck was built using the workflow it describes.',
+        content:
+          'Built using the workflow it describes — including this update, which went propose → apply → review → archive → pr.',
       },
     ],
     notes:
-      "Everything on this slide is a starting point. The footer note is intentional — we dogfooded this. The proposal, design, specs, and tasks for this presentation were all generated through the OpenSpec + Claude workflow. So you've just watched a live example.",
+      "Everything on this slide is a starting point. The footer note is intentional — we dogfooded this. Even this update — adding the new skills and CI automation to the deck — went through the full workflow: propose, apply, review, archive, pr. So you've just watched a live example.",
   },
 ]

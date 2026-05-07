@@ -32,21 +32,42 @@ See [`apps/README.md`](apps/README.md) for details.
 
 ## Workflow
 
-Development in this repo uses nine Claude Code skills, organized around the propose → implement → review → archive lifecycle:
+Development in this repo uses a CLI plus a set of Claude Code skills covering the full lifecycle, plus CI automation that closes the loop. Skills are grouped into three phases:
+
+### Plan
 
 | Skill | What it does |
 |---|---|
 | `/opsx:propose` | Describe what to build — Claude creates proposal, design, specs, and tasks |
 | `/opsx:explore` | Thinking-partner mode for investigation before committing to a change |
-| `/opsx:suggest` | Analyze an active change for risks, gaps, and improvements, then hand off to explore mode |
+| `/opsx:suggest` | Stress-test an active change — produces a risks/gaps/improvements report and pre-seeds explore |
+
+### Build
+
+| Skill | What it does |
+|---|---|
 | `/opsx:apply` | Implement the task list with full artifact context loaded |
-| `/opsx:refine` | Adjust delta specs and code mid-flight when implementation reveals a spec gap, ambiguity, or error |
-| `/opsx:review` | Run a code review of the current implementation against specs and tasks |
-| `/opsx:pr` | Open a pull request with the OpenSpec template and request an AI review |
-| `/opsx:archive` | Sync specs to the living library and close the change |
-| `/opsx:summarize` | Generate a human-readable summary of a completed or archived change |
+| `/opsx:refine` | Update specs and code together when implementation reveals a spec gap |
+| `/opsx:review` | Audit the diff against specs and tasks before opening a PR |
+
+### Ship & Close
+
+| Skill | What it does |
+|---|---|
+| `/opsx:pr` | Open the PR using the repo template and post an AI reviewer comment |
+| `/opsx:archive` | Sync delta specs into the living library and move the change to `archive/` |
+| `/opsx:summarize` | Generate `summary.md` for an archived change — a short, human-readable record |
 
 Each completed change is archived under `openspec/changes/archive/` with a datestamp, preserving the full decision history. A GitHub Action (`.github/workflows/spec-drift-monitor.md`) watches `main` for divergence between code and the living specs in `openspec/specs/` and opens an issue when drift is detected.
+
+### CI automation
+
+Two pieces run without explicit invocation and are responsible for catching things humans skip under pressure:
+
+- **Code Review Gate** — `CLAUDE.md` mandates a `code-review` subagent run after every implementation, before results are presented to the developer. Returns `APPROVED` or `CHANGES REQUESTED`.
+- **Spec Drift Monitor** — a [gh-aw](https://github.com/githubnext/gh-aw) workflow at [`.github/workflows/spec-drift-monitor.md`](.github/workflows/spec-drift-monitor.md) runs on merge to `main`. If it detects code that diverges from the living specs in `openspec/specs/`, it opens a GitHub issue assigned to the PR author so nothing slips through unnoticed.
+
+Together, every change is reviewed before merge, drift is surfaced after merge, and the developer never has to remember to run any of it.
 
 ## Goal
 
