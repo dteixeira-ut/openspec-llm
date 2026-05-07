@@ -1,9 +1,8 @@
 ---
 description: |
   Detects spec drift between code changes and living specs in openspec/specs/.
-  On pull requests to main: posts an informational drift comment (never blocks).
-  On merge to main: if drift is detected, creates a GitHub issue and assigns it
-  to the PR author so nothing slips through unnoticed after merge.
+  Runs on merge to main: if drift is detected, creates a GitHub issue and
+  assigns it to the PR author so nothing slips through unnoticed after merge.
 
 on:
   push:
@@ -12,6 +11,7 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  issues: read
 
 tools:
   github:

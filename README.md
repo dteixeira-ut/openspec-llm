@@ -32,16 +32,21 @@ See [`apps/README.md`](apps/README.md) for details.
 
 ## Workflow
 
-Development in this repo uses four Claude Code skills:
+Development in this repo uses nine Claude Code skills, organized around the propose → implement → review → archive lifecycle:
 
 | Skill | What it does |
 |---|---|
 | `/opsx:propose` | Describe what to build — Claude creates proposal, design, specs, and tasks |
 | `/opsx:explore` | Thinking-partner mode for investigation before committing to a change |
+| `/opsx:suggest` | Analyze an active change for risks, gaps, and improvements, then hand off to explore mode |
 | `/opsx:apply` | Implement the task list with full artifact context loaded |
+| `/opsx:refine` | Adjust delta specs and code mid-flight when implementation reveals a spec gap, ambiguity, or error |
+| `/opsx:review` | Run a code review of the current implementation against specs and tasks |
+| `/opsx:pr` | Open a pull request with the OpenSpec template and request an AI review |
 | `/opsx:archive` | Sync specs to the living library and close the change |
+| `/opsx:summarize` | Generate a human-readable summary of a completed or archived change |
 
-Each completed change is archived under `openspec/changes/archive/` with a datestamp, preserving the full decision history.
+Each completed change is archived under `openspec/changes/archive/` with a datestamp, preserving the full decision history. A GitHub Action (`.github/workflows/spec-drift-monitor.md`) watches `main` for divergence between code and the living specs in `openspec/specs/` and opens an issue when drift is detected.
 
 ## Goal
 
