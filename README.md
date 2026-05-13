@@ -26,9 +26,12 @@ openspec/
 
 ### `apps/presentation`
 
-A static React presentation app that walks through the OpenSpec + Claude workflow. Built for sharing with teams evaluating whether to adopt this approach. Covers spec-driven development concepts, a skill-by-skill walkthrough of how OpenSpec works with Claude Code, an honest pros/cons assessment, and open questions for team discussion.
+A static React presentation app that hosts two decks behind a small hash-routed shell:
 
-See [`apps/README.md`](apps/README.md) for details.
+- **Workflow deck** (`/#/workflow`) — the pitch. A skill-by-skill walkthrough of how OpenSpec works with Claude Code, plus an honest pros/cons assessment and open questions for team discussion.
+- **Research deck** (`/#/research`, with a leadership-friendly `/#/research/summary` variant) — the evidence. A case study covering the two-service NestJS migration of `enriched-video-uploads-v2`: the experiment, the findings (organized by class), the two mitigations shipped back into this repo (`harden-opsx-workflow`, `add-domain-skills`), and what's next.
+
+Both decks render from the same React shell with per-deck themes and a shared slide schema. See [`apps/presentation/README.md`](apps/presentation/README.md) for the source layout, routes, and authoring conventions.
 
 ## Workflow
 
