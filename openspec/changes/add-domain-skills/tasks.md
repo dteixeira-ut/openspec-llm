@@ -24,15 +24,15 @@
 
 ## 5. `service-config-drift` skill body
 
-- [ ] 5.1 Author `skills/service-config-drift/SKILL.md` with frontmatter, repo-agnostic self-check, input contract (target repo path or current working directory), and the three-step orchestration (run each auditor, collect results, emit consolidated report)
-- [ ] 5.2 Define the report shape — one section per auditor with status (`pass` / `fail` / `skipped`), findings, and the one-line fix
-- [ ] 5.3 Include the `## Graduation` section listing graduation triggers for this skill specifically
+- [x] 5.1 Author `skills/service-config-drift/SKILL.md` with frontmatter, repo-agnostic self-check, input contract (target repo path or current working directory), and the three-step orchestration (run each auditor, collect results, emit consolidated report)
+- [x] 5.2 Define the report shape — one section per auditor with status (`pass` / `fail` / `skipped`), findings, and the one-line fix
+- [x] 5.3 Include the `## Graduation` section listing graduation triggers for this skill specifically
 
 ## 6. `service-config-drift` auditors
 
-- [ ] 6.1 Write `skills/service-config-drift/auditors/prettierrc-parser-plugins.md` — precondition (decorator usage in TS sources), check logic, failure output, one-line fix
-- [ ] 6.2 Write `skills/service-config-drift/auditors/dockerfile-entrypoint.md` — checks (CMD references valid source; COPY includes `tsconfig.build.json` and `nest-cli.json` when they exist), failure output, fix guidance
-- [ ] 6.3 Write `skills/service-config-drift/auditors/ci-fmt-gate.md` — precondition (`package.json` `scripts.fmt` exists), check (workflow invokes `fmt`), failure output, one-line fix
+- [x] 6.1 Write `skills/service-config-drift/auditors/prettierrc-parser-plugins.md` — precondition (decorator usage in TS sources), check logic, failure output, one-line fix
+- [x] 6.2 Write `skills/service-config-drift/auditors/dockerfile-entrypoint.md` — checks (CMD references valid source; COPY includes `tsconfig.build.json` and `nest-cli.json` when they exist), failure output, fix guidance
+- [x] 6.3 Write `skills/service-config-drift/auditors/ci-fmt-gate.md` — precondition (`package.json` `scripts.fmt` exists), check (workflow invokes `fmt`), failure output, one-line fix
 
 ## 7. Living specs
 
