@@ -4,17 +4,19 @@
 
 The research deck SHALL be authored at `apps/presentation/src/decks/research/slides.ts` as a single slide array. Each slide SHALL declare a `density` field (`'full' | 'summary' | 'both'`) that drives which route renders it.
 
-#### Scenario: Full deck has ~25–30 slides
+#### Scenario: Full deck has ~22–28 slides
 - **WHEN** the research deck loads at `/#/research`
-- **THEN** the rendered slide list SHALL contain between 22 and 32 slides (target ~28), enough to support the seven-section narrative arc declared in design.md Decision 7
+- **THEN** the rendered slide list SHALL contain between 20 and 30 slides (target ~24), enough to support the six-section narrative arc declared in design.md Decision 7
 
 #### Scenario: Summary deck has ~10–15 slides
 - **WHEN** the research deck loads at `/#/research/summary`
 - **THEN** the rendered slide list SHALL contain between 9 and 16 slides (target ~12), preserving the narrative arc with one slide per section minimum
 
-### Requirement: Research deck narrative SHALL follow the seven-section arc
+### Requirement: Research deck narrative SHALL follow the six-section arc
 
-The research deck's slide order SHALL cover seven sections in this order: Frame, Process, Findings (by class), Mitigations shipped, Learnings, What's next, Close.
+The research deck's slide order SHALL cover six sections in this order: Frame, Process, Findings (by class), Mitigations shipped, Learnings, Close.
+
+Rationale: an earlier draft included a seventh "What's next" section with concrete follow-ups and open questions for the team; on user direction that section was removed so the deck ends on Learnings → Close. Follow-up work is captured in the project's OpenSpec change archive and tracked separately from the case-study record.
 
 #### Scenario: Frame section orients the audience
 - **WHEN** a viewer starts the deck
@@ -84,10 +86,5 @@ The research deck SHALL use only the existing UserTesting logo asset(s) and the 
 - **WHEN** `tailwind.config.ts` is inspected after the change
 - **THEN** the brand color block SHALL contain only the tokens that existed before the change (the research deck's visual distinction is achieved via existing tokens applied differently, not via new tokens)
 
-### Requirement: Research deck SHALL include a "What's next" section with concrete follow-ups
+<!-- The "What's next" requirement was removed on user direction during implementation; follow-up work is tracked outside the case-study record. See the rationale on the narrative-arc requirement above. -->
 
-The What's next section SHALL name specific follow-up work that is NOT included in the two mitigation changes — not generic "more research" framing.
-
-#### Scenario: Named follow-ups
-- **WHEN** a viewer reaches the What's next section
-- **THEN** the slides SHALL name at least three concrete follow-ups, for example: an org-level service-starter repo for sibling-config parity, rolling out `fmt`-in-CI across all TS services, graduating `migrate-to-nestjs` and `service-config-drift` to their own homes, running `service-config-drift` against every TS service in the org. The exact list MAY adjust as the team's priorities evolve, but the section SHALL NOT consist solely of open-ended questions

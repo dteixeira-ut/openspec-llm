@@ -126,11 +126,11 @@ Chosen over: rendering the landing as a slide-shaped deck of length 1 (would imp
 
 ### Decision 7: The research deck's narrative arc
 
-The full deck (~28 slides) is structured as:
+The full deck (~24 slides) is structured as:
 
 1. **Frame** (3 slides): the experiment, the consuming repo, what was measured.
 2. **Process** (4 slides): how the migration was driven by `/opsx:*`, the stacked-PR delivery shape, the per-capability slicing.
-3. **Findings — by class** (10 slides): two slides per finding class (overview + concrete example) covering:
+3. **Findings — by class** (~9 slides): two slides per finding class (overview + concrete example) where the example is structurally distinct, otherwise one slide with the example embedded inline. Classes:
    - Implicit deployment context (Gap 1, ConfigMap mount drift)
    - Silent agent decisions (`INVALID_ARGUMENT` vs `FAILED_PRECONDITION`, `logAction(CREATED)` vs legacy)
    - Delivery shape gaps (Gap 10 + squash×stacked rebase cost)
@@ -138,10 +138,11 @@ The full deck (~28 slides) is structured as:
    - Library-vs-spec mismatch (Kafka `Producer.disconnect()`)
 4. **Mitigations shipped** (4 slides): `harden-opsx-workflow` (the rules + `/opsx:plan` + silent-decisions marker) and `add-domain-skills` (the two repo-agnostic skills), with embedded artifact snippets.
 5. **Learnings** (3 slides): what SDD does well in practice; what it doesn't catch by construction; the must-ask vs may-decide framing as a transferable lesson.
-6. **What's next** (3 slides): the remaining gaps not yet mitigated (org-level service starter, fmt-in-CI rollout, sibling-config-drift audit on every TS service), graduation of the two domain skills to their own homes, open questions for the team.
-7. **Close** (1 slide): the dogfooding loop closed — this very deck was built using the workflow.
+6. **Close** (1 slide): the dogfooding loop closed — this very deck was built using the workflow.
 
-The summary deck (~12 slides) cuts: half of the per-class findings (one slide per class instead of two), drops the embedded artifact diffs, condenses Learnings into one slide. The narrative arc remains intact.
+The summary deck (~14 slides) cuts: half of the per-class findings (one slide per class instead of two), drops the embedded artifact diffs, condenses Learnings into one slide. The narrative arc remains intact.
+
+**Note**: an earlier draft of this design included a seventh "What's next" section (concrete follow-ups, open questions for the team, domain-skill graduation). Removed during implementation on user direction so the deck ends on Learnings → Close. Follow-up work is captured in the OpenSpec change archive and tracked separately from the case-study record.
 
 ### Decision 8: References to external artifacts use absolute URLs
 
