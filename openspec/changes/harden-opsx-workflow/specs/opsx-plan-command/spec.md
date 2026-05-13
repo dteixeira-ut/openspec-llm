@@ -67,7 +67,7 @@ The skill body SHALL live at `.claude/skills/openspec-plan/SKILL.md` and the com
 
 ### Requirement: `/opsx:plan` output SHALL be the basis for execution-time skill orchestration
 
-When implementation begins, agents SHOULD invoke skills in the order named in `plan.md` rather than re-deriving the order from the change artifacts.
+When implementation begins, agents MUST invoke skills in the order named in `plan.md` rather than re-deriving the order from the change artifacts, unless the user explicitly overrides the plan's ordering.
 
 #### Scenario: Skill order conflict between plan and ad-hoc invocation
 - **WHEN** an agent's chosen next-skill differs from the next-skill named in `plan.md`
