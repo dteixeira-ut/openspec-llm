@@ -20,7 +20,12 @@ openspec/
     archive/        # Completed changes
   specs/            # Living spec library — capabilities built so far
   config.yaml       # OpenSpec configuration
+skills/             # Domain skills (temporary home) — see skills/README.md
+  migrate-to-nestjs/
+  service-config-drift/
 ```
+
+The `skills/` directory hosts **domain skills** — reusable bodies of expertise that agents invoke against a target repo. They are deliberately separate from `.claude/skills/`, which hosts the OpenSpec workflow's own skills. See [`skills/README.md`](skills/README.md) for the framing, layout convention, and graduation criteria.
 
 ## Apps
 
