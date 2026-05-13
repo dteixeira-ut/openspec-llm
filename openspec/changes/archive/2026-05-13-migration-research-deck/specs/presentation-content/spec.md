@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Workflow deck slide source SHALL live at `src/decks/workflow/slides.ts`
 
