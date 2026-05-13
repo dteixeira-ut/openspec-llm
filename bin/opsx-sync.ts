@@ -223,6 +223,167 @@ function buildTargets(scope: "all" | "ci"): ToolTarget[] {
   return targets;
 }
 
+// ---------- Claude-isms scan ----------
+
+const CLAUDE_ISMS = ["AskUserQuestion", "TodoWrite", "ScheduleWakeup", "Skill tool"] as const;
+
+interface ClaudeIsmWarning {
+  file: string;
+  line: number; // 1-based
+  kind: "claude-ism" | "orphan-block";
+  match: string; // tool name (claude-ism) or hint name (orphan-block)
+}
+
+/**
+ * Scan a template body for:
+ * 1. Literal Claude-specific tool references outside HTML-comment affordance hints.
+ * 2. Block-level affordance hints whose next non-blank line is another HTML comment or EOF
+ *    (no tool-agnostic fallback).
+ *
+ * Returns a list of warnings; never throws.
+ */
+function scanForClaudeIsms(templatePath: string, body: string): ClaudeIsmWarning[] {
+  const warnings: ClaudeIsmWarning[] = [];
+  const lines = body.split("\n");
+
+  // First pass: build a per-line mask of "inside affordance comment?". An
+  // affordance comment opens on a line containing `<!-- Claude affordance:`
+  // and closes when the SAME or a SUBSEQUENT line contains `-->`. Single-line
+  // hints open and close on the same line.
+  const insideAffordance: boolean[] = new Array(lines.length).fill(false);
+  const affordanceOpenLines: number[] = []; // 0-based line indices where a block-level affordance opens (i.e., its `-->` is on a later line)
+  {
+    let open = false;
+    let openLineIdx = -1;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!open) {
+        const openIdx = line.indexOf("<!-- Claude affordance:");
+        if (openIdx >= 0) {
+          insideAffordance[i] = true;
+          const closeIdx = line.indexOf("-->", openIdx);
+          if (closeIdx >= 0) {
+            // Single-line affordance; opens and closes on this line.
+            // Not a block-level hint.
+            open = false;
+          } else {
+            open = true;
+            openLineIdx = i;
+          }
+        }
+      } else {
+        insideAffordance[i] = true;
+        const closeIdx = line.indexOf("-->");
+        if (closeIdx >= 0) {
+          open = false;
+          affordanceOpenLines.push(openLineIdx);
+          openLineIdx = -1;
+        }
+      }
+    }
+  }
+
+  // Second pass: literal Claude-ism scan, excluding affordance lines.
+  for (let i = 0; i < lines.length; i++) {
+    if (insideAffordance[i]) continue;
+    const line = lines[i];
+    for (const name of CLAUDE_ISMS) {
+      if (line.includes(name)) {
+        warnings.push({ file: templatePath, line: i + 1, kind: "claude-ism", match: name });
+      }
+    }
+  }
+
+  // Third pass: orphan block-level affordances. A block-level hint is one
+  // whose `-->` is on a different line than its opening `<!-- Claude
+  // affordance:`. For each, find the first non-blank line AFTER the closing
+  // `-->`. If that line is another HTML comment (`<!--`) or EOF, warn.
+  for (const openIdx of affordanceOpenLines) {
+    // Find the closing `-->` line index for this block.
+    let closeIdx = -1;
+    for (let j = openIdx; j < lines.length; j++) {
+      if (lines[j].includes("-->")) {
+        closeIdx = j;
+        break;
+      }
+    }
+    if (closeIdx < 0) continue; // malformed; skip
+    // Find next non-blank line after closeIdx.
+    let nextIdx = -1;
+    for (let j = closeIdx + 1; j < lines.length; j++) {
+      if (lines[j].trim() !== "") {
+        nextIdx = j;
+        break;
+      }
+    }
+    if (nextIdx < 0 || lines[nextIdx].trim().startsWith("<!--")) {
+      warnings.push({
+        file: templatePath,
+        line: openIdx + 1,
+        kind: "orphan-block",
+        match: "block-level affordance",
+      });
+    }
+  }
+
+  return warnings;
+}
+
+function formatClaudeIsmWarning(w: ClaudeIsmWarning): string {
+  const rel = `templates/opsx/${path.basename(w.file)}`;
+  if (w.kind === "claude-ism") {
+    return `WARN: ${rel}:${w.line}: Claude-specific tool reference '${w.match}' — replace with tool-agnostic prose`;
+  }
+  return `WARN: ${rel}:${w.line}: Block-level Claude affordance has no tool-agnostic fallback below — add prose immediately after the closing '-->'`;
+}
+
+// ---------- self-test ----------
+
+async function runSelfTest(): Promise<void> {
+  const fixtures: { name: string; body: string; expect: (ws: ClaudeIsmWarning[]) => boolean }[] = [
+    {
+      name: "raw Claude-ism warns",
+      body: "Use the AskUserQuestion tool to ask.\n",
+      expect: (ws) => ws.length === 1 && ws[0].kind === "claude-ism" && ws[0].match === "AskUserQuestion" && ws[0].line === 1,
+    },
+    {
+      name: "single-line affordance is ignored",
+      body: "<!-- Claude affordance: use AskUserQuestion with options=[A, B] -->\nask the user to choose A or B.\n",
+      expect: (ws) => ws.length === 0,
+    },
+    {
+      name: "block-level affordance with fallback is clean",
+      body: "<!-- Claude affordance: poll\nUse ScheduleWakeup with delay.\n-->\n\nEmit the URL and exit.\n",
+      expect: (ws) => ws.length === 0,
+    },
+    {
+      name: "orphan block-level affordance warns",
+      body: "<!-- Claude affordance: poll\nUse ScheduleWakeup with delay.\n-->\n",
+      expect: (ws) => ws.some((w) => w.kind === "orphan-block"),
+    },
+    {
+      name: "multiple Claude-isms reported",
+      body: "Use the TodoWrite tool.\nUse the Skill tool to invoke X.\n",
+      expect: (ws) => ws.length === 2,
+    },
+  ];
+
+  const failures: string[] = [];
+  for (const fx of fixtures) {
+    const ws = scanForClaudeIsms("/tmp/fixture.md", fx.body);
+    if (!fx.expect(ws)) {
+      failures.push(`self-test failed: ${fx.name}; got ${JSON.stringify(ws)}`);
+    }
+  }
+  if (failures.length > 0) {
+    // eslint-disable-next-line no-console
+    console.error(failures.join("\n"));
+    process.exit(1);
+  }
+  // eslint-disable-next-line no-console
+  console.log(`opsx-sync: self-test passed (${fixtures.length} fixtures).`);
+}
+
 async function loadTemplates(): Promise<Template[]> {
   const entries = await fs.readdir(TEMPLATES_DIR, { withFileTypes: true });
   const templates: Template[] = [];
@@ -376,11 +537,13 @@ async function runSync(targets: ToolTarget[], templates: Template[], mode: "writ
 
 // ---------- CLI ----------
 
-function parseArgs(argv: string[]): { check: boolean; scope: "all" | "ci" } {
+function parseArgs(argv: string[]): { check: boolean; scope: "all" | "ci"; selfTest: boolean } {
   let check = false;
   let scope: "all" | "ci" = "all";
+  let selfTest = false;
   for (const a of argv) {
     if (a === "--check") check = true;
+    else if (a === "--self-test") selfTest = true;
     else if (a === "--scope=ci") scope = "ci";
     else if (a === "--scope=all") scope = "all";
     else if (a === "--help" || a === "-h") {
@@ -393,25 +556,48 @@ function parseArgs(argv: string[]): { check: boolean; scope: "all" | "ci" } {
       process.exit(2);
     }
   }
-  return { check, scope };
+  return { check, scope, selfTest };
 }
 
 function printUsage(): void {
   // eslint-disable-next-line no-console
   console.error(
-    `Usage: bin/opsx-sync [--check] [--scope=ci|all]
+    `Usage: bin/opsx-sync [--check] [--scope=ci|all] [--self-test]
 
 Generates per-tool command files from templates/opsx/*.md.
-  --check        Dry-run; exit 1 on drift.
+  --check        Dry-run; exit 1 on drift. Emits non-fatal warnings for
+                 Claude-specific tool references outside affordance hints
+                 and for block-level affordances missing a tool-agnostic
+                 fallback.
   --scope=ci     Skip the Codex global path (used by CI).
-  --scope=all    Include all three tools (default).`,
+  --scope=all    Include all three tools (default).
+  --self-test    Run the Claude-isms scanner against built-in fixtures
+                 and exit. Used to verify the warn pipeline.`,
   );
 }
 
 async function main() {
-  const { check, scope } = parseArgs(process.argv.slice(2));
+  const { check, scope, selfTest } = parseArgs(process.argv.slice(2));
+  if (selfTest) {
+    await runSelfTest();
+    return;
+  }
   const targets = buildTargets(scope);
   const templates = await loadTemplates();
+
+  if (check) {
+    // Claude-isms scan: emit non-fatal warnings for every match. Runs on
+    // every template's raw body (the same body that gets rendered to each
+    // tool's output). Does not influence exit status.
+    for (const tpl of templates) {
+      const ws = scanForClaudeIsms(tpl.sourceFile, tpl.body);
+      for (const w of ws) {
+        // eslint-disable-next-line no-console
+        console.warn(formatClaudeIsmWarning(w));
+      }
+    }
+  }
+
   const { result, diffs } = await runSync(targets, templates, check ? "check" : "write");
 
   if (check) {

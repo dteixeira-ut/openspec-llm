@@ -14,7 +14,7 @@ Analyze an active OpenSpec change for improvement opportunities and potential is
 
 1. **Select the change**
 
-   Same pattern as `/opsx:apply` — infer from context, auto-select if only one active change, otherwise run `openspec list --json` and use **AskUserQuestion** to let the user choose.
+   Same pattern as `/opsx:apply` — infer from context, auto-select if only one active change, otherwise run `openspec list --json` and ask the user to choose which change to analyze.
 
    Announce: "Analyzing change: <name>"
 
@@ -67,7 +67,7 @@ Analyze an active OpenSpec change for improvement opportunities and potential is
 
 4. **Hand off to explore mode**
 
-   Invoke the explore workflow (Claude: use the **Skill tool** to invoke `opsx:explore`; other tools: invoke the equivalent slash command), passing the insights report as the entry context so the user lands in an interactive exploration session pre-seeded with the findings.
+   Invoke the /opsx:explore workflow, passing the insights report as the entry context so the user lands in an interactive exploration session pre-seeded with the findings.
 
    The explore prompt should be: "I've analyzed the '<name>' change and found the following insights. Let's explore these together: <paste the full insights report>"
 

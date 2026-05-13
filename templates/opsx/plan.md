@@ -31,8 +31,8 @@ active change exists, or prompt.
    If a name is provided, use it. Otherwise:
    - Infer from conversation context.
    - Auto-select if exactly one active change exists.
-   - If ambiguous, run `openspec list --changes --json` and use the
-     **AskUserQuestion tool** to let the user select.
+   - If ambiguous, run `openspec list --changes --json` and ask the user
+     to choose which change to plan.
 
    Announce: `Planning change: <name>`.
 
@@ -62,10 +62,12 @@ active change exists, or prompt.
 
    - If exactly one method is allowed → that is the merge-method.
    - If multiple are allowed → honor `design.md`'s `## Delivery shape` if
-     it picks one; otherwise this is a must-ask class, use
-     **AskUserQuestion**.
-   - If `gh` is unavailable, unauthenticated, or ambiguous → prompt via
-     **AskUserQuestion**. Do not silently default.
+     it picks one; otherwise this is a must-ask class.
+     <!-- Claude affordance: use AskUserQuestion with options=[squash, merge, rebase] -->
+     Ask the user to choose one of: squash, merge, or rebase.
+   - If `gh` is unavailable, unauthenticated, or ambiguous:
+     <!-- Claude affordance: use AskUserQuestion with options=[squash, merge, rebase] -->
+     ask the user to choose one of: squash, merge, or rebase. Do not silently default.
 
 5. **Resolve must-ask classes**
 
@@ -78,7 +80,11 @@ active change exists, or prompt.
    - Stop conditions.
 
    If they cannot be derived from the artifacts or repo settings, stop and
-   ask via **AskUserQuestion**.
+   ask the user. For sub-PR strategy:
+   <!-- Claude affordance: use AskUserQuestion with options=[one big PR, per-capability stack, per-capability parallel] -->
+   ask the user to choose one of: "one big PR", "per-capability stack", or "per-capability parallel". For the intermediate-PR build gate:
+   <!-- Claude affordance: use AskUserQuestion with options=[lint-only, lint+test, lint+test+build] -->
+   ask the user to choose one of: "lint-only", "lint+test", or "lint+test+build". For stop conditions, ask the user to enumerate them.
 
 6. **Compose `plan.md`**
 

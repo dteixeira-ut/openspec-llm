@@ -15,7 +15,7 @@ Archive a completed change in the experimental workflow.
 
 1. **If no change name provided, prompt for selection**
 
-   Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+   Run `openspec list --json` to get available changes. Ask the user which change to archive.
 
    Show only active changes (not already archived).
    Include the schema used for each change if available.
@@ -58,10 +58,11 @@ Archive a completed change in the experimental workflow.
    - Show a combined summary before prompting
 
    **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
+   <!-- Claude affordance: use AskUserQuestion with options=[Sync now (recommended), Archive without syncing] (when changes needed) or options=[Archive now, Sync anyway, Cancel] (when already synced) -->
+   - If changes needed: ask the user to choose one of: "Sync now (recommended)" or "Archive without syncing".
+   - If already synced: ask the user to choose one of: "Archive now", "Sync anyway", or "Cancel".
 
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
+   If user chooses sync, delegate to a sub-agent or sub-workflow that invokes `openspec-sync-specs` for the change, passing the delta spec analysis summary as context (prompt: "Invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 
 5. **Perform the archive**
 
@@ -72,7 +73,7 @@ Archive a completed change in the experimental workflow.
    Parse the branch name for a Jira ticket ID matching `RAD-\d+` (e.g., `dteixeira-ut/feature/RAD-123/add-auth` → `RAD-123`).
 
    - If a ticket ID is found: use it as the parent folder
-   - If no ticket ID is found: use **AskUserQuestion** — "No ticket ID found in branch name (`<branch>`). Enter a ticket ID (e.g. RAD-123) or press Enter to use `misc/`." Use `misc` if the user skips.
+   - If no ticket ID is found: ask the user — "No ticket ID found in branch name (`<branch>`). Enter a ticket ID (e.g. RAD-123) or press Enter to use `misc/`." Use `misc` if the user skips.
 
    **Create the archive directory and move the change:**
    ```bash
@@ -100,7 +101,7 @@ Archive a completed change in the experimental workflow.
 
    Read `openspec/config.yaml`. If a `hooks.post-archive` list exists, execute each entry in order.
 
-   For `/opsx:summarize`: invoke the summarize workflow (Claude: use the **Skill tool** to invoke `opsx:summarize`; other tools: invoke the equivalent slash command), passing the archived change name. Show the summary output inline below the archive completion summary.
+   For `/opsx:summarize`: invoke the /opsx:summarize workflow, passing the archived change name. Show the summary output inline below the archive completion summary.
 
    If config.yaml cannot be read or no hooks are defined, skip silently.
 

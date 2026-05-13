@@ -24,8 +24,7 @@ When ready to implement, run /opsx:apply
 
 1. **If no input provided, ask what they want to build**
 
-   Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
-   > "What change do you want to work on? Describe what you want to build or fix."
+   Ask the user: "What change do you want to work on? Describe what you want to build or fix."
 
    From their description, derive a kebab-case name (e.g., "add user authentication" → `add-user-auth`).
 
@@ -56,7 +55,7 @@ When ready to implement, run /opsx:apply
      `## Why` or `## What Changes`, and a `git ls-files` scan of the
      directories named in scope.
 
-   For each legacy file, prompt the planner (via **AskUserQuestion**):
+   For each legacy file, ask the planner:
 
    > "Legacy file `<path>` — what behavior here must the new implementation
    > preserve exactly? What may diverge?"
@@ -68,7 +67,7 @@ When ready to implement, run /opsx:apply
 
 5. **Create artifacts in sequence until apply-ready**
 
-   Use the **TodoWrite tool** to track progress through the artifacts.
+   Track your progress against the listed artifacts.
 
    Loop through artifacts in dependency order (artifacts with no pending dependencies first):
 
@@ -95,7 +94,7 @@ When ready to implement, run /opsx:apply
       - Stop when all `applyRequires` artifacts are done
 
    c. **If an artifact requires user input** (unclear context):
-      - Use **AskUserQuestion tool** to clarify
+      - Ask the user to clarify
       - Then continue with creation
 
 6. **Show final status**

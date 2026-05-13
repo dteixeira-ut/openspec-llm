@@ -11,6 +11,10 @@ If you find yourself editing a file under `.claude/commands/opsx/`,
 `.cursor/commands/`, or `${CODEX_HOME:-$HOME/.codex}/prompts/` — stop. Edit
 the matching `templates/opsx/<id>.md` and re-run `bin/opsx-sync`.
 
+> **Authoring rule:** template bodies MUST be tool-agnostic. See
+> [Tool-agnostic authoring](#tool-agnostic-authoring) before writing or
+> editing a template.
+
 ## Canonical workflow set
 
 | id | command surfaces |
@@ -119,6 +123,57 @@ npm run opsx-sync -- --check
 Exits `0` when every per-tool output matches what the generator would
 write; `1` otherwise, with a diff printed for each out-of-sync file. CI
 runs the same command with `--scope=ci` (skips the Codex global path).
+
+## Tool-agnostic authoring
+
+Template bodies fan out to Claude, Cursor, and Codex without per-tool
+branching. The body MUST therefore read as portable prose — direct
+references to Claude-specific tool names (`AskUserQuestion`, `TodoWrite`,
+`ScheduleWakeup`, `Skill tool`) do not belong in the canonical text.
+
+**Replacement recipe**
+
+| Claude-ism | Tool-agnostic replacement |
+|---|---|
+| `use the **AskUserQuestion tool** to ask` (free-form) | `ask the user: "<question>"` |
+| `use the **AskUserQuestion tool** to let the user select` (discrete options) | prepend `<!-- Claude affordance: use AskUserQuestion with options=[A, B] -->`, then prose `ask the user to choose one of: A or B` |
+| `use the **Skill tool** to invoke <skill-name>` | `invoke the <slash-command-name> workflow` |
+| `use the **TodoWrite tool** to track progress` | `track your progress against the listed steps` |
+| `use ScheduleWakeup` (multi-step Claude-only sub-flow) | wrap in a block-level `<!-- Claude affordance: <short name> ... -->` comment with a tool-agnostic fallback immediately below |
+
+**HTML-comment affordance hints (two shapes)**
+
+1. **Single-line hint** — only for discrete-option AskUserQuestion calls:
+
+   ```markdown
+   <!-- Claude affordance: use AskUserQuestion with options=[A, B] -->
+   Ask the user to choose one of: A or B.
+   ```
+
+2. **Block-level hint** — only for multi-step Claude-only sub-flows that
+   have a working tool-agnostic fallback. The closing `-->` is on its own
+   line; the very next non-blank line MUST be working prose for
+   Cursor/Codex:
+
+   ```markdown
+   <!-- Claude affordance: poll for reviewer response
+   Use the ScheduleWakeup tool with delaySeconds: 120 ...
+   -->
+
+   After posting the reviewer comment, emit the PR URL ...
+   ```
+
+Rule for both shapes: **the prose immediately following the hint MUST be a
+valid, executable step on its own for Cursor and Codex** — the hint
+augments cross-tool prose, it never replaces it. Hints SHALL NOT be used
+for `TodoWrite`, `Skill tool`, or free-form questions — tool-agnostic
+prose handles those fully.
+
+**Regression catch:** `npm run opsx-sync -- --check` scans every template
+body for literal Claude tool names outside affordance hints and warns
+(non-fatal) per line. It also warns when a block-level affordance has no
+tool-agnostic fallback below it. CI does not fail on these warns; fix
+them before merge.
 
 ## Known limitations
 

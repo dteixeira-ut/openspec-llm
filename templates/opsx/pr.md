@@ -14,13 +14,15 @@ Create a pull request for a completed OpenSpec change, post an AI reviewer comme
 
 1. **Select the change**
 
-   Infer from context or run `openspec list --json` and use **AskUserQuestion** to let the user select.
+   Infer from context or run `openspec list --json` and ask the user to choose which change to open a PR for.
    Announce: "Creating PR for change: <name>"
 
 2. **Check pre-conditions**
 
    - Confirm a review has been run by looking for recent `APPROVED` output in the conversation.
-   - If no review is found: warn the user — "No review result found. Run `/opsx:review` first." — then **AskUserQuestion**: "Proceed without review?" If no, stop. If yes, continue with a warning note.
+   - If no review is found: warn the user — "No review result found. Run `/opsx:review` first." — then
+     <!-- Claude affordance: use AskUserQuestion with options=[Yes, No] -->
+     ask the user: "Proceed without review?" (choose one of: Yes or No). If no, stop. If yes, continue with a warning note.
 
 3. **Read change context**
 
@@ -60,10 +62,10 @@ Create a pull request for a completed OpenSpec change, post an AI reviewer comme
      the canonical branch identifier for the stacked PR).
    - The PR body MUST include a "Stacked on top of #<prior>; merge in order"
      line at the top of the `# Purpose` section. If the prior PR number is not
-     known, ask the user via **AskUserQuestion** before continuing.
+     known, ask the user for it before continuing.
 
    Otherwise (no active change, or branch does not match a capability name),
-   use the **Skill tool** to invoke `git-workflow` as before. If the branch is
+   invoke the git-workflow workflow as before. If the branch is
    non-compliant, stop and show the required format.
 
 5. **Generate PR title**
@@ -136,7 +138,8 @@ Create a pull request for a completed OpenSpec change, post an AI reviewer comme
 
 10. **Start polling loop**
 
-   Use the **ScheduleWakeup tool** with `delaySeconds: 120` to schedule the first poll check.
+   <!-- Claude affordance: poll for reviewer response
+   Use the ScheduleWakeup tool with `delaySeconds: 120` to schedule the first poll check.
 
    Pass this prompt (fill in the actual values before scheduling):
    ```
@@ -156,6 +159,9 @@ Create a pull request for a completed OpenSpec change, post an AI reviewer comme
    ```bash
    gh pr view <PR-URL> --json comments --jq '.comments | length'
    ```
+   -->
+
+   After posting the reviewer comment, emit the PR URL. The reviewer (if configured) will respond asynchronously; the user should monitor the PR at the printed URL.
 
 **Output On PR Creation**
 

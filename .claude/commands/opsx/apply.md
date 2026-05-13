@@ -18,7 +18,7 @@ Implement tasks from an OpenSpec change.
    If a name is provided, use it. Otherwise:
    - Infer from conversation context if the user mentioned a change
    - Auto-select if only one active change exists
-   - If ambiguous, run `openspec list --json` to get available changes and use the **AskUserQuestion tool** to let the user select
+   - If ambiguous, run `openspec list --json` to get available changes and ask the user to choose which change to apply
 
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
 
@@ -88,9 +88,9 @@ Implement tasks from an OpenSpec change.
 
    When all tasks are complete (all checkboxes `[x]`, or `state: "all_done"` from CLI):
 
-   Invoke `opsx:code-review` (Claude: use the **Skill tool**; other tools: invoke the equivalent slash command). Pass the change name as context: "Review implementation of change '<name>'."
+   Invoke the /opsx:code-review workflow. Pass the change name as context: "Review implementation of change '<name>'."
 
-   For tools without a Skill tool, run the review inline: get the git diff, load context files (`tasks.md`, `design.md`, specs), assess task coverage and code quality, and return a decision.
+   If the /opsx:code-review workflow is not available in the current environment, run the review inline: get the git diff, load context files (`tasks.md`, `design.md`, specs), assess task coverage and code quality, and return a decision.
 
    Display the full review result inline.
 

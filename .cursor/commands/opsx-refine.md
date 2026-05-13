@@ -36,13 +36,13 @@ Operates ONLY on active changes in `openspec/changes/`. NEVER modifies `openspec
    If a name is provided, use it. Otherwise:
    - Infer from conversation context
    - Auto-select if only one active change exists
-   - If ambiguous, use the **AskUserQuestion tool** to let the user pick from `openspec list --changes --json`
+   - If ambiguous, ask the user to choose which change to refine from the list returned by `openspec list --changes --json`
 
    Announce: `Refining change: <name>`; mention override syntax `/opsx:refine <other> <issue>`.
 
 3. **Get the issue description**
 
-   If provided inline, use it. Otherwise use the **AskUserQuestion tool** to ask: *"What issue did you find? Describe the problem you encountered during implementation or verification."*
+   If provided inline, use it. Otherwise ask the user: *"What issue did you find? Describe the problem you encountered during implementation or verification."*
 
 4. **Check status**
 
@@ -64,7 +64,9 @@ Operates ONLY on active changes in `openspec/changes/`. NEVER modifies `openspec
 
    Compare the issue against the change's proposal scope. In scope: bug in code this change introduced/modified; spec gap or ambiguity in a requirement this change added/modified; existing spec for the same capability is ambiguous and blocks this change. Out of scope: entirely new behavior not mentioned in the proposal, or an issue in a different capability.
 
-   If out of scope, use the **AskUserQuestion tool** with four options: (1) **out of scope** — exit and emit the out-of-scope output template; (2) **partial scope** — route the in-scope portion through steps 7–9, defer the rest to the partial-scope output template; (3) **it IS related** — ask the user to explain, then proceed; (4) **abort** — exit gracefully. **Do NOT invoke `/opsx:propose` on the user's behalf.**
+   If out of scope:
+   <!-- Claude affordance: use AskUserQuestion with options=[out of scope, partial scope, it IS related, abort] -->
+   ask the user to choose one of: (1) **out of scope** — exit and emit the out-of-scope output template; (2) **partial scope** — route the in-scope portion through steps 7–9, defer the rest to the partial-scope output template; (3) **it IS related** — ask the user to explain, then proceed; (4) **abort** — exit gracefully. **Do NOT invoke `/opsx:propose` on the user's behalf.**
 
 7. **Classify the issue and pick the action**
 
@@ -88,7 +90,7 @@ Operates ONLY on active changes in `openspec/changes/`. NEVER modifies `openspec
    **Affected spec**: <capability>/spec.md (or "code only")
    ```
 
-   If classification is uncertain, use the **AskUserQuestion tool** to let the user decide.
+   If classification is uncertain, ask the user to decide on the classification.
 
 8. **Update the delta spec (if required)**
 
@@ -161,7 +163,7 @@ The marker section is omitted entirely when no may-decide calls were made.
 - NEVER create new tasks in `tasks.md` for the refinement — the fix happens now.
 - If a requirement was ADDED in this change, edit the ADDED block in place — do not create a duplicate MODIFIED block.
 - Keep code changes minimal — fix the issue, nothing more.
-- If classification or affected capability is uncertain, use the **AskUserQuestion tool** — don't guess.
+- If classification or affected capability is uncertain, ask the user — don't guess.
 - If the change has accumulated several refinements, suggest the user revisit the original proposal's scope.
 - Pause on errors, blockers, or unclear requirements.
 
