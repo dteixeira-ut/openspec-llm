@@ -7,6 +7,8 @@ tags: [workflow, archive, experimental]
 
 Archive a completed change in the experimental workflow.
 
+> ⚠ **Do NOT bypass this skill by calling `openspec archive` directly** — the post-archive hooks in `openspec/config.yaml` (step 7 below) only fire from this skill, so a CLI-only archive will silently skip `summary.md` generation and any other configured side effects. See `openspec/specs/opsx-workflow/spec.md` (Requirement: Workflow operations with declared side effects).
+
 **Input**: Optionally specify a change name after `/opsx:archive` (e.g., `/opsx:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
