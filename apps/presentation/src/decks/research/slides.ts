@@ -12,6 +12,10 @@ import type { ResearchSlide } from '../../types'
  *   in this repo.
  * - Mitigation #2: `openspec/changes/archive/2026-05-13-add-domain-skills/`
  *   in this repo.
+ * - Mitigation #3: `openspec/changes/archive/RAD-75634/single-source-opsx-templates/`
+ *   in this repo.
+ * - Mitigation #4: `openspec/changes/archive/RAD-75634/tool-agnostic-opsx-templates/`
+ *   in this repo.
  */
 // Canonical research-notes URL — referenced in callout text bodies as a string
 // so individual `evidence` callouts can name the section/line range. Kept as an
@@ -22,6 +26,10 @@ const HARDEN_ARCHIVE_URL =
   'https://github.com/dteixeira-ut/openspec-claude/tree/main/openspec/changes/archive/2026-05-13-harden-opsx-workflow'
 const SKILLS_ARCHIVE_URL =
   'https://github.com/dteixeira-ut/openspec-claude/tree/main/openspec/changes/archive/2026-05-13-add-domain-skills'
+const SINGLE_SOURCE_ARCHIVE_URL =
+  'https://github.com/dteixeira-ut/openspec-llm/tree/main/openspec/changes/archive/RAD-75634/single-source-opsx-templates'
+const TOOL_AGNOSTIC_ARCHIVE_URL =
+  'https://github.com/dteixeira-ut/openspec-llm/tree/main/openspec/changes/archive/RAD-75634/tool-agnostic-opsx-templates'
 const SELF_CHANGE_URL =
   'https://github.com/dteixeira-ut/openspec-claude/tree/main/openspec/changes/migration-research-deck'
 
@@ -474,7 +482,7 @@ export const researchSlides: ResearchSlide[] = [
       "This is the cleanest 'agent did the right thing' story in the run — but only because we had a paused-on-ambiguity culture. Without the contract, a less conservative agent could have npm-installed kafkajs and rewired the producer, which would have been a worse local choice.",
   },
 
-  // ───────────────────────── Section 4 — MITIGATIONS SHIPPED (4 slides) ─────────────
+  // ───────────────────────── Section 4 — MITIGATIONS SHIPPED (8 slides) ─────────────
   {
     id: 'mitigation-harden-overview',
     title: 'Mitigation #1 — harden-opsx-workflow',
@@ -584,6 +592,111 @@ export const researchSlides: ResearchSlide[] = [
     notes:
       "If anyone in the room runs a plugin registry or shared-skills home, this is the slide to invite them to take ownership. The skills are designed to move.",
   },
+  {
+    id: 'mitigation-single-source-overview',
+    title: 'Mitigation #3 — single-source-opsx-templates',
+    density: 'both',
+    body: [
+      {
+        type: 'bullets',
+        items: [
+          'Three drifted workflow trees (Claude commands, Cursor commands, Codex prompts) collapsed into one canonical templates/opsx/ directory — the only place an opsx workflow body is hand-authored.',
+          'bin/opsx-sync — a Node generator — fans each canonical template out to its tool-specific command paths (.claude/commands/opsx/, .cursor/commands/opsx/, $CODEX_HOME/prompts/).',
+          'CI drift-check at .github/workflows/opsx-template-drift.yml runs bin/opsx-sync --check on every PR; any divergence between canonical templates and generated outputs fails the gate.',
+          'Auto-invocation preserved — the rich description: frontmatter on each canonical template is carried verbatim into the per-tool emitters so skill-routing behavior does not regress.',
+        ],
+      },
+      {
+        type: 'link',
+        label: 'Read the archived change →',
+        href: SINGLE_SOURCE_ARCHIVE_URL,
+      },
+    ],
+    notes:
+      "This is the structural fix the deck didn't have a slot for at v1: workflow bodies used to live in three trees, each one drifting from the others between commits. The mitigation collapses them to one source plus a generator, so 'which Claude command is canonical?' has a defined answer.",
+  },
+  {
+    id: 'mitigation-single-source-architecture',
+    title: 'Canonical templates + generator + CI drift gate',
+    density: 'full',
+    body: [
+      {
+        type: 'bullets',
+        items: [
+          'Canonical source: templates/opsx/<id>.md — the only location SHALL contain a hand-authored opsx workflow body.',
+          'Per-tool output paths fanned out by bin/opsx-sync: .claude/commands/opsx/<id>.md (Claude Code), .cursor/commands/opsx/<id>.md (Cursor), $CODEX_HOME/prompts/opsx-<id>.md (Codex, global per upstream openspec).',
+          'CI drift-check covers Claude + Cursor scopes; Codex global path is a known scope gap (the runner can\'t write to $CODEX_HOME) — called out explicitly so it doesn\'t go silent.',
+          'Local re-sync is one command: node bin/opsx-sync (or --check for verification).',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'evidence',
+        content:
+          'From the opsx-templates living spec: "no other location SHALL contain hand-authored opsx workflow bodies" — anything outside templates/opsx/ is a generator output and the drift-check enforces it.',
+      },
+    ],
+    notes:
+      "Codex prompts are kept at the global $CODEX_HOME path to match upstream openspec behavior — moving them project-local would diverge from how the broader Codex ecosystem expects prompt files to be discovered. The drift gate skips that scope deliberately, not by oversight.",
+  },
+  {
+    id: 'mitigation-tool-agnostic-overview',
+    title: 'Mitigation #4 — tool-agnostic-opsx-templates',
+    density: 'both',
+    body: [
+      {
+        type: 'bullets',
+        items: [
+          '7 of 11 canonical templates rewritten in tool-agnostic prose — they read identically when emitted to Claude, Cursor, or Codex.',
+          '28 Claude-specific tool references (AskUserQuestion, Task, WebFetch, etc.) removed from template bodies; behavior preserved.',
+          'HTML-comment affordance hints introduced as the only Claude-specific surface — invisible to renderers, picked up by Claude when present, ignored otherwise.',
+          'bin/opsx-sync warn extended with a Claude-isms scan — any new Claude-only token landing in a canonical template trips a warning at sync time.',
+        ],
+      },
+      {
+        type: 'link',
+        label: 'Read the archived change →',
+        href: TOOL_AGNOSTIC_ARCHIVE_URL,
+      },
+    ],
+    notes:
+      "Mitigation #3 made there be one source. Mitigation #4 made that source not be silently Claude-flavored. Together they let the same canonical template body drive three different agent tools without forking.",
+  },
+  {
+    id: 'mitigation-tool-agnostic-affordances',
+    title: 'The affordance-hint pattern — augment, never replace',
+    density: 'full',
+    body: [
+      {
+        type: 'text',
+        content:
+          'The pattern: write the instruction in tool-agnostic prose, then attach a Claude-specific affordance hint in an HTML comment. The comment is invisible to non-Claude renderers; Claude picks it up and uses the named tool. The prose remains the source of truth — the hint is a fast-path, not a substitute.',
+      },
+      {
+        type: 'diff',
+        before:
+          '// apply.md — discrete-option prompt (before)\nWhen multiple paths exist, use the\n**AskUserQuestion tool** to let the\nuser select between options A, B, C.',
+        after:
+          '// apply.md — discrete-option prompt (after)\nWhen multiple paths exist, ask the user\nto choose between options A, B, C.\n<!-- affordance: if AskUserQuestion is\navailable, prefer it for discrete picks. -->',
+        language: 'text',
+      },
+      {
+        type: 'bullets',
+        items: [
+          'Block-level shape (used by pr.md\'s polling loop) wraps a multi-step affordance in <!-- affordance-block --> ... <!-- /affordance-block -->; the surrounding prose still works without it.',
+          'Augment-never-replace rule: the tool-agnostic body MUST stand alone. The hint is allowed to make the same step faster on Claude, never to make it possible only on Claude.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'evidence',
+        content:
+          'From the tool-agnostic-opsx-templates living spec, scenario "Block-level hint missing a tool-agnostic fallback": bin/opsx-sync\'s warn pass treats a block-level affordance whose surrounding prose cannot execute on a non-Claude tool as a generator-level violation — the safety net that keeps the rule from drifting.',
+      },
+    ],
+    notes:
+      "Use the diff as the centerpiece — audiences grasp the pattern faster from one before/after than from any amount of prose. The pr.md polling loop is the strongest in-repo example of the block-level shape; if asked for code, point at that template.",
+  },
 
   // ───────────────────────── Section 5 — LEARNINGS (3 slides) ─────────────
   {
@@ -680,7 +793,7 @@ export const researchSlides: ResearchSlide[] = [
         items: [
           'migration-research-deck — proposal, design, three capability specs, tasks.md — all authored under the harden-opsx-workflow rules.',
           'Every silent decision the agent made while authoring the deck was logged in a "Decisions made without consultation" section — the same marker the deck talks about.',
-          'The two mitigations shipped before this deck was authored. The author was a /opsx:apply agent reading the artifacts.',
+          'Two of the four mitigations shipped before this deck was authored; two more (`single-source-opsx-templates`, `tool-agnostic-opsx-templates`) shipped AFTER, because the deck itself surfaced gaps the original case study missed. The author of each round was a /opsx:apply agent reading the artifacts of the prior round.',
           'If you spotted a gap in the deck, the framework now has a verb for it: /opsx:refine.',
         ],
       },

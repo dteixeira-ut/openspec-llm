@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export type Deck = 'workflow' | 'research' | 'landing'
+export type Deck = 'workflow' | 'research' | 'landing' | 'package-extraction'
 export type Density = 'full' | 'summary'
 
 export type Route = {
@@ -16,6 +16,7 @@ export type Route = {
  *  - `#/workflow`                              -> { deck: 'workflow', density: 'full' }
  *  - `#/research`                              -> { deck: 'research', density: 'full' }
  *  - `#/research/summary`                      -> { deck: 'research', density: 'summary' }
+ *  - `#/package-extraction`                    -> { deck: 'package-extraction', density: 'full' }
  *
  * Density is irrelevant for non-research decks but is set to `'full'` for type completeness.
  */
@@ -32,6 +33,7 @@ function parseHash(hash: string): Route {
     if (second === 'summary') return { deck: 'research', density: 'summary' }
     return { deck: 'research', density: 'full' }
   }
+  if (first === 'package-extraction') return { deck: 'package-extraction', density: 'full' }
 
   return { deck: 'landing', density: 'full' }
 }

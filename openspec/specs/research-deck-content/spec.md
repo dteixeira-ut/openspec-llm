@@ -7,13 +7,13 @@ TBD - created by archiving change migration-research-deck. Update Purpose after 
 
 The research deck SHALL be authored at `apps/presentation/src/decks/research/slides.ts` as a single slide array. Each slide SHALL declare a `density` field (`'full' | 'summary' | 'both'`) that drives which route renders it.
 
-#### Scenario: Full deck has ~22–28 slides
+#### Scenario: Full deck has ~24–34 slides
 - **WHEN** the research deck loads at `/#/research`
-- **THEN** the rendered slide list SHALL contain between 20 and 30 slides (target ~24), enough to support the six-section narrative arc declared in design.md Decision 7
+- **THEN** the rendered slide list SHALL contain between 24 and 34 slides (target ~28), enough to support the six-section narrative arc declared in design.md Decision 7 with four mitigations covered at 2 slides each
 
-#### Scenario: Summary deck has ~10–15 slides
+#### Scenario: Summary deck has ~10–16 slides
 - **WHEN** the research deck loads at `/#/research/summary`
-- **THEN** the rendered slide list SHALL contain between 9 and 16 slides (target ~12), preserving the narrative arc with one slide per section minimum
+- **THEN** the rendered slide list SHALL contain between 9 and 17 slides (target ~13), preserving the narrative arc with one slide per section minimum
 
 ### Requirement: Research deck narrative SHALL follow the six-section arc
 
@@ -29,13 +29,13 @@ Rationale: an earlier draft included a seventh "What's next" section with concre
 - **WHEN** a viewer reaches the Findings section
 - **THEN** the slides SHALL be grouped by finding class — at minimum: implicit deployment context, silent agent decisions, delivery shape gaps, configuration drift, library-vs-spec mismatch — not by chronological discovery order
 
-#### Scenario: Mitigations section links to shipped changes
+#### Scenario: Mitigations section links to all shipped changes
 - **WHEN** a viewer reaches the Mitigations section
-- **THEN** the slides SHALL name `harden-opsx-workflow` and `add-domain-skills` explicitly AND include direct links (via `finding.mitigation` or `link` content items) to the relevant artifacts in the `openspec/changes/archive/` tree
+- **THEN** the slides SHALL name all four shipped mitigations explicitly — `harden-opsx-workflow`, `add-domain-skills`, `single-source-opsx-templates`, and `tool-agnostic-opsx-templates` — AND include direct links (via `finding.mitigation` or `link` content items) to the relevant artifacts in the `openspec/changes/archive/RAD-75634/` tree
 
 #### Scenario: Close slide closes the loop
 - **WHEN** a viewer reaches the final slide
-- **THEN** the slide SHALL state that this deck was itself built using the workflow it discusses (the dogfooding loop) and SHALL include a link to its own OpenSpec change (`migration-research-deck`)
+- **THEN** the slide SHALL state that this deck was itself built using the workflow it discusses (the dogfooding loop), SHALL acknowledge that two of the four mitigations shipped AFTER the deck was first authored (using that gap as evidence the loop self-corrects), and SHALL include a link to its own OpenSpec change (`migration-research-deck`)
 
 ### Requirement: Research deck SHALL embed concrete evidence
 

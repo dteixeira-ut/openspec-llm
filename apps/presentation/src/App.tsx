@@ -5,6 +5,8 @@ import { slides as workflowSlides } from './decks/workflow/slides'
 import { workflowTheme } from './decks/workflow/theme'
 import { researchSlides } from './decks/research/slides'
 import { researchTheme } from './decks/research/theme'
+import { packageExtractionSlides } from './decks/package-extraction/slides'
+import { packageExtractionTheme } from './decks/package-extraction/theme'
 
 export default function App() {
   const route = useHashRoute()
@@ -15,6 +17,10 @@ export default function App() {
 
   if (route.deck === 'workflow') {
     return <DeckView slides={workflowSlides} theme={workflowTheme} />
+  }
+
+  if (route.deck === 'package-extraction') {
+    return <DeckView slides={packageExtractionSlides} theme={packageExtractionTheme} />
   }
 
   // research deck — filter slides by density.

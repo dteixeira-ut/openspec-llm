@@ -53,7 +53,7 @@ export interface ResearchSlide extends Slide {
  * re-skinned via its `theme.ts` without editing the renderer.
  */
 export type Theme = {
-  name: 'workflow' | 'research'
+  name: 'workflow' | 'research' | 'package-extraction'
   /** Outer stage wrapper. Combined with `stage-glow` or texture classes. */
   stageClasses: string
   /** Slide card container classes. */

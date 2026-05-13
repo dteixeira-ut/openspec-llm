@@ -1,27 +1,28 @@
 /**
- * LandingPage — root entry point for the presentation app. Renders two cards
- * (Workflow, Research) plus a one-paragraph framing block. Uses the workflow
- * deck's stage treatment so the brand entry point feels continuous with the
- * existing experience (design.md Decision 6).
+ * LandingPage — root entry point for the presentation app. Renders three cards
+ * (Workflow, Research, Package Extraction) plus a one-paragraph framing block.
+ * Uses the workflow deck's stage treatment so the brand entry point feels
+ * continuous with the existing experience (design.md Decision 6).
  */
 export function LandingPage() {
   return (
     <div className="stage-glow relative min-h-screen bg-ut-navy-dark flex flex-col font-sans">
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-4 py-14 gap-10">
-        <header className="w-full max-w-4xl text-center space-y-3 animate-fade-up">
+        <header className="w-full max-w-5xl text-center space-y-3 animate-fade-up">
           <p className="section-marker text-white/50">OpenSpec + Claude</p>
           <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">
-            Two decks. One workflow.
+            Three decks. One workflow.
           </h1>
           <p className="text-white/70 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            The pitch and the case study live side by side. The workflow deck explains how
+            The pitch, the case study, and what&apos;s next. The workflow deck explains how
             spec-driven development with Claude is meant to work. The research deck shows
-            what happened when we ran it against a real two-service NestJS migration —
-            what worked, what didn&apos;t, and what we shipped to close the gaps.
+            what happened when we ran it against a real two-service NestJS migration. The
+            package-extraction deck pitches the next phase: shipping the workflow as a
+            versioned npm package consuming repos can pin.
           </p>
         </header>
 
-        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-5">
           <a
             href="#/workflow"
             className="group rounded-2xl bg-white shadow-2xl overflow-hidden animate-fade-up hover:-translate-y-0.5 transition-transform"
@@ -72,6 +73,28 @@ export function LandingPage() {
                   View summary
                 </a>
               </div>
+            </div>
+          </a>
+
+          <a
+            href="#/package-extraction"
+            className="group rounded-2xl bg-white shadow-2xl overflow-hidden animate-fade-up hover:-translate-y-0.5 transition-transform"
+          >
+            <div className="h-1.5 w-full bg-ut-teal" />
+            <div className="p-8 space-y-3">
+              <p className="section-marker">Deck 3</p>
+              <h2 className="text-2xl font-bold text-ut-navy leading-tight">
+                Package Extraction
+              </h2>
+              <p className="text-gray-600 text-base leading-relaxed">
+                The next phase: extract <code className="text-sm">templates/opsx/</code> and{' '}
+                <code className="text-sm">bin/opsx-sync</code> into a versioned npm package
+                (<code className="text-sm">@usertesting/insight-out-opsx</code>) so every UT
+                repo can pin a version and stay in sync.
+              </p>
+              <p className="text-ut-blue text-sm font-semibold mt-3 group-hover:underline">
+                Open package-extraction deck →
+              </p>
             </div>
           </a>
         </div>
