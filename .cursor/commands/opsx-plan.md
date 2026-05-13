@@ -1,7 +1,6 @@
 ---
-name: "OPSX: Plan"
+name: opsx-plan
 description: "Emit a delivery-plan artifact (plan.md) for an active OpenSpec change, capturing PR shape, repo merge-method, named /opsx:* skill invocations per boundary, intermediate-PR build gate, stop conditions, and the rebase recipe when applicable. Use when the user wants to plan execution after /opsx:propose but before /opsx:apply, or when delivery shape changes mid-implementation."
-category: Workflow
 tags: [workflow, plan, delivery-shape, experimental]
 ---
 

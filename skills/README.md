@@ -12,16 +12,19 @@ These skills were authored alongside real work in this repo (the NestJS migratio
 
 This is explicitly a **temporary home**. The goal is to move each skill out when it outgrows this repo — see [Graduation](#graduation) below.
 
-## `skills/` vs `.claude/skills/`
+## `skills/` vs the opsx workflow templates
 
-There are two skills directories in this repo and they exist for different reasons:
+This folder is for **domain skills**. The opsx workflow itself (the
+`/opsx:*` commands) no longer lives as Claude Code skills — it is generated
+from canonical templates under `templates/opsx/`, fanned out to each tool
+by `bin/opsx-sync`. The two layers exist for different reasons:
 
-| Directory | What lives here | Examples |
+| Location | What lives here | Examples |
 |---|---|---|
-| `.claude/skills/` | Skills that **are part of the OpenSpec workflow itself** — invoked by `/opsx:*` commands or required for the workflow to operate. | `openspec-propose`, `openspec-apply-change`, `openspec-archive-change` |
+| `templates/opsx/` | The **opsx workflow itself** — canonical Markdown bodies for the `/opsx:*` commands, generated out to `.claude/commands/opsx/`, `.cursor/commands/`, and `$CODEX_HOME/prompts/`. | `apply`, `archive`, `propose`, `plan`, `code-review` |
 | `skills/` (this folder) | **Domain skills** — consumed by agents working in any TS-service repo, but not coupled to the OpenSpec workflow. | `migrate-to-nestjs`, `service-config-drift` |
 
-**Rule**: if a new skill is required for `/opsx:*` to work, it belongs in `.claude/skills/`. Otherwise, it belongs here.
+**Rule**: if a new workflow is required for `/opsx:*` to work, it belongs as a canonical template under `templates/opsx/`. Otherwise, it belongs here.
 
 ## Per-skill layout
 
@@ -52,7 +55,7 @@ Each `SKILL.md` must include a **repo-agnostic self-check** near the top stating
 
 ### 2. Frontmatter matches the workflow skills
 
-Use YAML frontmatter with the same fields as the `.claude/skills/openspec-*/SKILL.md` files:
+Use YAML frontmatter with these fields (mirroring the convention used by the opsx workflow templates under `templates/opsx/`):
 
 ```yaml
 ---
@@ -106,6 +109,6 @@ A "temporary home" is only useful if there's a credible path out. A skill gradua
 
 While authoring this README:
 
-1. Used a markdown table for the `skills/` vs `.claude/skills/` distinction rather than prose — clearer at a glance.
+1. Used a markdown table for the `skills/` vs `templates/opsx/` distinction rather than prose — clearer at a glance.
 2. Listed established subfolder names (`recipes/`, `auditors/`, `examples/`) explicitly so future authors don't invent new ones unnecessarily; new names are allowed but should be justified in the skill's own README or commit message.
 3. Set "at least one release cycle" for the `MOVED.md` stub lifetime without defining "release cycle" precisely. Concrete definition deferred until the first graduation event forces the question.

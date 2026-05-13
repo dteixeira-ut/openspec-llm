@@ -1,11 +1,10 @@
 ---
-name: "OPSX: Refine"
-description: "Refine delta specs and fix code for an active OpenSpec change when implementation reveals a spec gap, ambiguity, or error. Use when the user is mid-implementation and discovers that the change's specs were incomplete, ambiguous, or wrong and need to be tightened alongside a code fix."
+id: refine
+title: Refine
+description: Refine delta specs and fix code for an active OpenSpec change when implementation reveals a spec gap, ambiguity, or error. Use when the user is mid-implementation and discovers that the change's specs were incomplete, ambiguous, or wrong and need to be tightened alongside a code fix.
 category: Workflow
 tags: [workflow, artifacts, experimental]
 ---
-
-<!-- generated from templates/opsx/refine.md — do not edit -->
 
 Refine the delta specs and fix code for an active OpenSpec change. Use when implementation or verification reveals that the change's specifications were incomplete, ambiguous, or incorrect.
 

@@ -540,7 +540,7 @@ export const researchSlides: ResearchSlide[] = [
       {
         type: 'bullets',
         items: [
-          'Creates skills/ at the repo root (separate from .claude/skills/ — domain skills vs workflow skills).',
+          'Creates skills/ at the repo root for domain skills (workflow skills then lived under .claude/skills/; later folded into templates/opsx/ via the single-source-opsx-templates change).',
           'Ships skills/migrate-to-nestjs/ — the migration procedure generalized: Step-0 sibling-file inspection, the per-PR build gate, stacked-PR conventions, must-ask classes specific to NestJS migrations.',
           'Ships skills/service-config-drift/ — one skill, three auditors: prettierrc parser plugins, Dockerfile entry-point references, CI fmt gate presence.',
           'Each skill is captured as a living spec under openspec/specs/skill-*/ so the drift monitor watches them.',

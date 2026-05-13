@@ -1,10 +1,10 @@
 ---
-name: opsx-suggest
+id: suggest
+title: Suggest
 description: Analyze an active OpenSpec change for risks, gaps, and improvements, then enter explore mode pre-seeded with the findings. Use when the user wants a stress-test of a change before implementing.
+category: Workflow
 tags: [workflow, analysis, explore, experimental]
 ---
-
-<!-- generated from templates/opsx/suggest.md — do not edit -->
 
 Analyze an active OpenSpec change for improvement opportunities and potential issues, then hand off to explore mode.
 

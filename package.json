@@ -1,0 +1,16 @@
+{
+  "name": "openspec-llm",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenSpec + Claude — workspace root; hosts canonical opsx workflow templates and the bin/opsx-sync generator.",
+  "bin": {
+    "opsx-sync": "bin/opsx-sync"
+  },
+  "scripts": {
+    "opsx-sync": "node bin/opsx-sync"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

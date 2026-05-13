@@ -1,14 +1,15 @@
 ---
-name: opsx-review
-description: Run a code review of the current implementation against specs and tasks. Use when the user wants to audit a completed implementation before opening a PR, or to manually invoke the review gate.
-tags: [workflow, review, quality]
+name: "OPSX: Code Review"
+description: "Review implemented code changes from a code reviewer's perspective. Checks task coverage, design alignment, and code quality. Returns APPROVED or CHANGES REQUESTED. Use when the user wants the post-implementation review gate run, or after any implementation work is complete."
+category: Workflow
+tags: [workflow, review, gate, quality]
 ---
 
-<!-- generated from templates/opsx/review.md — do not edit -->
+<!-- generated from templates/opsx/code-review.md — do not edit -->
 
 Review implemented code changes and decide whether they are ready to present to the developer.
 
-**Input**: Optionally provide a brief description of what was implemented. If omitted, the review is based entirely on the git diff and any context files found in the repo.
+**Input**: A change summary describing what was implemented and why. If invoked as a subagent, this is provided in the prompt. Also inspect the repo directly.
 
 **Steps**
 
@@ -39,7 +40,7 @@ Review implemented code changes and decide whether they are ready to present to 
    - Specs: `spec.md` files, any `specs/` directories
    - CLAUDE.md at repo root for repo conventions
 
-   Read whatever you find. If nothing exists, proceed using only the diff and any description provided.
+   Read whatever you find. If nothing exists, proceed using only the diff and the change summary provided.
 
 3. **Review each changed file**
 
@@ -59,8 +60,8 @@ Review implemented code changes and decide whether they are ready to present to 
 
    For every agent-authored artifact in the diff (`proposal.md`, `design.md`,
    `specs/<capability>/spec.md`, `tasks.md`, `plan.md`, PR bodies, `summary.md`),
-   scan the diff for evidence of decisions that were not explicitly ratified by
-   the user in the conversation:
+   scan the diff for evidence of decisions made without explicit user
+   consultation:
 
    - Filename, identifier, or section-header choices not named by the user
    - Default values introduced (e.g. defaulting an intermediate-PR build gate
@@ -70,21 +71,9 @@ Review implemented code changes and decide whether they are ready to present to 
    - Trade-offs accepted on ambiguous tasks
 
    If candidates exist AND the artifact has no `## Decisions made without
-   consultation` section, surface a finding:
-
-   ```
-   Marker missing — likely silent decisions detected
-   Artifact: <path>
-   Candidates:
-     - <decision 1>
-     - <decision 2>
-   ```
-
-   The finding is informational unless multiple candidates accumulate; it does
-   NOT by itself flip the decision to `CHANGES REQUESTED`. Use the finding to
-   trigger a follow-up question; flip to `CHANGES REQUESTED` only when the
-   missing marker would mask a must-ask-class decision per
-   `openspec/config.yaml` `ambiguity.must-ask`.
+   consultation` section, surface a finding `Marker missing — likely silent
+   decisions detected` in the Notes (or Issues if the missing marker would mask
+   a must-ask-class decision per `openspec/config.yaml` `ambiguity.must-ask`).
 
 5. **Make the decision**
 
@@ -101,6 +90,8 @@ Review implemented code changes and decide whether they are ready to present to 
 
 6. **Return a structured result**
 
+   End your response with this exact block (the calling agent parses `**Decision:**`):
+
    ```
    ## Code Review Result
 
@@ -110,7 +101,7 @@ Review implemented code changes and decide whether they are ready to present to 
    <brief description of what was reviewed: files changed, scope, what tasks were covered>
 
    ### Notes
-   - <optional non-blocking observations>
+   - <optional non-blocking observations — style, minor improvements, things worth knowing>
    ```
 
    Or if requesting changes:
@@ -125,18 +116,15 @@ Review implemented code changes and decide whether they are ready to present to 
 
    ### Issues
    - <specific, actionable issue — include file and line if possible>
+   - <another issue>
 
    ### Notes
    - <optional non-blocking observations>
    ```
 
-**After the review:**
-- If `APPROVED` → suggest `/opsx:archive` as the next step
-- If `CHANGES REQUESTED` → show the issues clearly and wait for guidance before proceeding
-
 **Guardrails**
 - Flag real issues, not style preferences — only block on correctness, security, and completeness
-- Be specific: vague feedback is not actionable; name the file and the problem
+- Be specific: vague feedback like "improve error handling" is not actionable; name the file and the problem
 - Do not suggest changes outside the scope of what was implemented
 - Do not approve work that has unimplemented tasks or critical bugs — be a genuine gatekeeper
 - If context files are missing, review the diff on its own merits; don't fail because docs don't exist

@@ -1,9 +1,11 @@
 ---
 name: "OPSX: Apply"
-description: Implement tasks from an OpenSpec change (Experimental)
+description: Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.
 category: Workflow
 tags: [workflow, artifacts, experimental]
 ---
+
+<!-- generated from templates/opsx/apply.md — do not edit -->
 
 Implement tasks from an OpenSpec change.
 
@@ -86,7 +88,9 @@ Implement tasks from an OpenSpec change.
 
    When all tasks are complete (all checkboxes `[x]`, or `state: "all_done"` from CLI):
 
-   Use the **Skill tool** to invoke `opsx:review`, passing the change name as context: "Review implementation of change '<name>'."
+   Invoke `opsx:code-review` (Claude: use the **Skill tool**; other tools: invoke the equivalent slash command). Pass the change name as context: "Review implementation of change '<name>'."
+
+   For tools without a Skill tool, run the review inline: get the git diff, load context files (`tasks.md`, `design.md`, specs), assess task coverage and code quality, and return a decision.
 
    Display the full review result inline.
 
@@ -151,12 +155,16 @@ The two-class contract defined in `openspec/config.yaml` `ambiguity:` and the
 
 - **Must-ask classes** — stop and escalate. The full list lives in
   `openspec/config.yaml`. At apply-time these surface most often as:
-  library-vs-spec surface mismatches, deletion of files not listed in
-  `tasks.md`, promotion of transitive dependencies, and any choice between
-  two equally-plausible WHEN/THEN interpretations.
+  library-vs-spec surface mismatches (the spec calls a method the library does
+  not expose), deletion of files not listed in `tasks.md`, promotion of
+  transitive dependencies to direct, and any choice between two
+  equally-plausible WHEN/THEN interpretations.
 - **May-decide classes** — proceed with a reasonable default AND record the
   decision in the relevant artifact's `## Decisions made without
-  consultation` section (or in the PR body if no authored artifact hosts it).
+  consultation` section. If apply touches `tasks.md`, `proposal.md`,
+  `design.md`, a delta spec, or `plan.md`, the marker section is the right
+  home. If apply only touches code and there is no authored artifact in the
+  diff to host the marker, log the call in the PR body when `/opsx:pr` runs.
 
 The marker section is omitted entirely when no may-decide calls were made.
 
@@ -164,7 +172,8 @@ The marker section is omitted entirely when no may-decide calls were made.
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - Apply the ambiguity contract: stop on must-ask classes; for may-decide
-  classes proceed and log the call
+  classes proceed and log the call in the relevant artifact's
+  `## Decisions made without consultation` section
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task
 - Update task checkbox immediately after completing each task

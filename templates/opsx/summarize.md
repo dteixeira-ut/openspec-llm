@@ -1,11 +1,10 @@
 ---
-name: "OPSX: Summarize"
+id: summarize
+title: Summarize
 description: Generate a concise, human-readable summary of a completed or archived OpenSpec change and write it as summary.md alongside the other artifacts. Use when the user wants a short record of what shipped, why, and the key decisions — typically after archive.
 category: Workflow
 tags: [workflow, summary, documentation]
 ---
-
-<!-- generated from templates/opsx/summarize.md — do not edit -->
 
 Generate a concise, human-readable summary of an OpenSpec change.
 

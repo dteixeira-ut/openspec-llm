@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+// Shim: re-execute the TypeScript implementation. Node 22.6+ strips
+// TypeScript natively (default in Node 23.6+). If using older Node, run
+// the equivalent: `node --experimental-strip-types bin/opsx-sync.ts`.
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const here = dirname(fileURLToPath(import.meta.url));
+await import(join(here, "opsx-sync.ts"));

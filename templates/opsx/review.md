@@ -1,10 +1,10 @@
 ---
-name: opsx-review
+id: review
+title: Review
 description: Run a code review of the current implementation against specs and tasks. Use when the user wants to audit a completed implementation before opening a PR, or to manually invoke the review gate.
+category: Workflow
 tags: [workflow, review, quality]
 ---
-
-<!-- generated from templates/opsx/review.md — do not edit -->
 
 Review implemented code changes and decide whether they are ready to present to the developer.
 

@@ -15,6 +15,8 @@ This project uses OpenSpec + Claude Code as the development workflow for everyth
 ```
 apps/
   presentation/     # React app — walkthrough of the OpenSpec + Claude workflow
+bin/
+  opsx-sync         # Generator: fan templates/opsx/*.md out to per-tool command paths
 openspec/
   changes/          # Active and archived changes (proposals, designs, specs, tasks)
     archive/        # Completed changes
@@ -23,9 +25,11 @@ openspec/
 skills/             # Domain skills (temporary home) — see skills/README.md
   migrate-to-nestjs/
   service-config-drift/
+templates/
+  opsx/             # Canonical opsx workflow templates (single source) — see templates/opsx/README.md
 ```
 
-The `skills/` directory hosts **domain skills** — reusable bodies of expertise that agents invoke against a target repo. They are deliberately separate from `.claude/skills/`, which hosts the OpenSpec workflow's own skills. See [`skills/README.md`](skills/README.md) for the framing, layout convention, and graduation criteria.
+The `skills/` directory hosts **domain skills** — reusable bodies of expertise that agents invoke against a target repo. They are separate from the opsx workflow itself, which lives as canonical templates under `templates/opsx/` and is generated out to each tool by `bin/opsx-sync`. See [`skills/README.md`](skills/README.md) for the domain-skills framing and [`templates/opsx/README.md`](templates/opsx/README.md) for the workflow template layer.
 
 ## Apps
 
@@ -67,6 +71,16 @@ Development in this repo uses a CLI plus a set of Claude Code skills covering th
 | `/opsx:summarize` | Generate `summary.md` for an archived change — a short, human-readable record |
 
 Each completed change is archived under `openspec/changes/archive/` with a datestamp, preserving the full decision history. A GitHub Action (`.github/workflows/spec-drift-monitor.md`) watches `main` for divergence between code and the living specs in `openspec/specs/` and opens an issue when drift is detected.
+
+### Canonical workflow templates
+
+The `/opsx:*` workflow bodies (apply, archive, explore, plan, pr, propose, refine, review, suggest, summarize, plus the `code-review` helper) live at `templates/opsx/<id>.md` as the **single source of truth**. The generator `bin/opsx-sync` fans them out to per-tool command paths:
+
+- Claude Code → `.claude/commands/opsx/<id>.md`
+- Cursor → `.cursor/commands/opsx-<id>.md`
+- Codex → `${CODEX_HOME:-$HOME/.codex}/prompts/opsx-<id>.md` (global; lives outside the repo and is NOT covered by the CI drift gate — re-run `bin/opsx-sync` locally to keep your global Codex prompts current)
+
+The recipe for absorbing upstream changes safely is `openspec update && bin/opsx-sync` — the second command re-applies our patched templates over upstream's regenerated commands. The CI workflow at `.github/workflows/opsx-template-drift.yml` runs `bin/opsx-sync --check --scope=ci` on every PR and fails on any drift between `templates/opsx/` and the committed Claude/Cursor outputs.
 
 ### CI automation
 

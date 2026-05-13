@@ -1,10 +1,10 @@
 ---
-name: opsx-explore
+id: explore
+title: Explore
 description: Enter explore mode - a thinking partner for exploring ideas, investigating problems, and clarifying requirements. Use when the user wants to think through something before or during a change.
+category: Workflow
 tags: [workflow, explore, experimental, thinking]
 ---
-
-<!-- generated from templates/opsx/explore.md — do not edit -->
 
 Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes.
 

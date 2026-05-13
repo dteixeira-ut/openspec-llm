@@ -5,19 +5,19 @@ TBD - created by archiving change add-domain-skills. Update Purpose after archiv
 ## Requirements
 ### Requirement: Repo SHALL contain a top-level `skills/` directory for domain skills
 
-The repository SHALL contain a directory at `skills/` (sibling to `apps/`, `openspec/`, `.claude/`) hosting domain skills that are not part of the OpenSpec workflow itself.
+The repository SHALL contain a directory at `skills/` (sibling to `apps/`, `openspec/`, `templates/`) hosting domain skills that are not part of the OpenSpec workflow itself.
 
 #### Scenario: Skills directory present
 - **WHEN** the change is merged
 - **THEN** `skills/` SHALL exist at the repo root and SHALL contain `README.md` plus at least one skill subdirectory
 
 #### Scenario: Concern boundary preserved
-- **WHEN** a new skill is added that is part of the OpenSpec workflow itself (consumed by `/opsx:*` commands or required for the workflow to operate)
-- **THEN** the skill SHALL be placed under `.claude/skills/` and NOT under `skills/`
+- **WHEN** a new workflow is added that is part of the OpenSpec workflow itself (consumed by `/opsx:*` commands or required for the workflow to operate)
+- **THEN** the workflow SHALL be placed as a canonical template under `templates/opsx/` and NOT under `skills/`
 
 ### Requirement: `skills/README.md` SHALL document the temporary-home framing
 
-The `skills/README.md` SHALL document (a) the rationale for hosting domain skills in this repo, (b) the concern boundary between `skills/` and `.claude/skills/`, (c) authoring conventions, (d) explicit graduation criteria, and (e) what graduation means procedurally.
+The `skills/README.md` SHALL document (a) the rationale for hosting domain skills in this repo, (b) the concern boundary between `skills/` and the opsx workflow templates under `templates/opsx/`, (c) authoring conventions, (d) explicit graduation criteria, and (e) what graduation means procedurally.
 
 #### Scenario: Authoring conventions documented
 - **WHEN** a contributor opens `skills/README.md`

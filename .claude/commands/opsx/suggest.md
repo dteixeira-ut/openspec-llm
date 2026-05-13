@@ -1,9 +1,11 @@
 ---
 name: "OPSX: Suggest"
-description: Analyze an active change for risks, gaps, and improvements, then enter explore mode pre-seeded with findings
+description: Analyze an active OpenSpec change for risks, gaps, and improvements, then enter explore mode pre-seeded with the findings. Use when the user wants a stress-test of a change before implementing.
 category: Workflow
 tags: [workflow, analysis, explore, experimental]
 ---
+
+<!-- generated from templates/opsx/suggest.md — do not edit -->
 
 Analyze an active OpenSpec change for improvement opportunities and potential issues, then hand off to explore mode.
 
@@ -66,7 +68,7 @@ Analyze an active OpenSpec change for improvement opportunities and potential is
 
 4. **Hand off to explore mode**
 
-   Use the **Skill tool** to invoke `opsx:explore`, passing the insights report as the entry context so the user lands in an interactive exploration session pre-seeded with the findings.
+   Invoke the explore workflow (Claude: use the **Skill tool** to invoke `opsx:explore`; other tools: invoke the equivalent slash command), passing the insights report as the entry context so the user lands in an interactive exploration session pre-seeded with the findings.
 
    The explore prompt should be: "I've analyzed the '<name>' change and found the following insights. Let's explore these together: <paste the full insights report>"
 

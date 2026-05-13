@@ -1,0 +1,44 @@
+name: opsx template drift
+
+on:
+  pull_request:
+    paths:
+      - "templates/opsx/**"
+      - ".claude/commands/opsx/**"
+      - ".cursor/commands/opsx-*.md"
+      - "bin/opsx-sync"
+      - "bin/opsx-sync.ts"
+      - "package.json"
+      - ".github/workflows/opsx-template-drift.yml"
+  push:
+    branches:
+      - main
+
+jobs:
+  drift-check:
+    name: opsx-sync --check (Claude + Cursor scopes)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: |
+          # Generator uses Node stdlib only; npm ci is a no-op when there is
+          # no lockfile but we still keep the step so the contract matches the
+          # documented `npm ci && npm run opsx-sync` recipe.
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Run drift check
+        # --scope=ci skips the Codex global path (~/.codex/prompts) which
+        # lives outside the repo and cannot be verified in CI.
+        run: npm run opsx-sync -- --check --scope=ci

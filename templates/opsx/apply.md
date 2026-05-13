@@ -1,10 +1,10 @@
 ---
-name: opsx-apply
+id: apply
+title: Apply
 description: Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.
+category: Workflow
 tags: [workflow, artifacts, experimental]
 ---
-
-<!-- generated from templates/opsx/apply.md — do not edit -->
 
 Implement tasks from an OpenSpec change.
 

@@ -1,10 +1,10 @@
 ---
-name: opsx-pr
-description: "Create a pull request with the OpenSpec template, post an AI reviewer comment (e.g. @cursor), and poll for AI reviewer response. Use when the user wants to open a PR for a completed change after running /opsx:review."
+id: pr
+title: PR
+description: Create a pull request with the OpenSpec template, post an AI reviewer comment (e.g. @cursor), and poll for AI reviewer response. Use when the user wants to open a PR for a completed change after running /opsx:review.
+category: Workflow
 tags: [workflow, pr, github, review, experimental]
 ---
-
-<!-- generated from templates/opsx/pr.md — do not edit -->
 
 Create a pull request for a completed OpenSpec change, post an AI reviewer comment, and poll for a response.
 

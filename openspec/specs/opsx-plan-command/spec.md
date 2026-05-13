@@ -5,7 +5,7 @@ TBD - created by archiving change harden-opsx-workflow. Update Purpose after arc
 ## Requirements
 ### Requirement: `/opsx:plan` SHALL emit a delivery-plan artifact
 
-A new command `/opsx:plan` and supporting skill `openspec-plan` SHALL consume an active change's artifacts (`proposal.md`, `design.md`, `specs/`, `tasks.md`) and write a `plan.md` artifact capturing the execution plan.
+A new command `/opsx:plan` SHALL consume an active change's artifacts (`proposal.md`, `design.md`, `specs/`, `tasks.md`) and write a `plan.md` artifact capturing the execution plan.
 
 `plan.md` MUST include:
 - Named `/opsx:*` skill invocations per boundary (propose-end, capability-start, capability-end, archive)
@@ -60,13 +60,18 @@ The plan skill SHALL treat repo merge-method, sub-PR strategy, intermediate-PR b
 - **WHEN** the design's `Delivery shape` section is silent on sub-PR strategy and the plan skill cannot infer it
 - **THEN** the skill SHALL prompt the user explicitly and SHALL NOT silently default
 
-### Requirement: `/opsx:plan` skill body lives in the repo
+### Requirement: `/opsx:plan` workflow body lives in the canonical templates
 
-The skill body SHALL live at `.claude/skills/openspec-plan/SKILL.md` and the command SHALL live at `.claude/commands/opsx/plan.md`, matching the layout of the existing `openspec-*` skills.
+The canonical workflow body SHALL live at `templates/opsx/plan.md` and the
+generated Claude command SHALL live at `.claude/commands/opsx/plan.md`,
+matching the per-tool layout produced by `bin/opsx-sync`. The legacy
+`.claude/skills/openspec-plan/SKILL.md` path is superseded — Claude's
+auto-invocation now reads the rich `description:` from the generated
+command file directly.
 
-#### Scenario: Skill file present
+#### Scenario: Workflow files present
 - **WHEN** the change is archived and merged
-- **THEN** both `.claude/skills/openspec-plan/SKILL.md` and `.claude/commands/opsx/plan.md` SHALL exist in the repo at the documented paths
+- **THEN** both `templates/opsx/plan.md` and `.claude/commands/opsx/plan.md` SHALL exist in the repo at the documented paths
 
 ### Requirement: `/opsx:plan` output SHALL be the basis for execution-time skill orchestration
 

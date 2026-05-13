@@ -1,13 +1,14 @@
 ---
-name: /opsx-summarize
-id: opsx-summarize
-category: Workflow
-description: Generate a concise human-readable summary of a completed or archived OpenSpec change
+name: opsx-summarize
+description: Generate a concise, human-readable summary of a completed or archived OpenSpec change and write it as summary.md alongside the other artifacts. Use when the user wants a short record of what shipped, why, and the key decisions — typically after archive.
+tags: [workflow, summary, documentation]
 ---
+
+<!-- generated from templates/opsx/summarize.md — do not edit -->
 
 Generate a concise, human-readable summary of an OpenSpec change.
 
-**Input**: Optionally specify a change name (e.g., `/opsx-summarize add-auth`). If omitted, finds the most recently archived change automatically.
+**Input**: Optionally specify a change name (e.g., `/opsx:summarize add-auth`). If omitted, finds the most recently archived change automatically.
 
 **Steps**
 
@@ -21,7 +22,7 @@ Generate a concise, human-readable summary of an OpenSpec change.
    ```bash
    ls -td openspec/changes/archive/*/ 2>/dev/null | head -5
    ```
-   Use the most recently modified change directory found.
+   Then within each ticket folder, find the most recently modified change directory. Use the most recent one found.
 
    Announce: "Summarizing change: <name> (from <path>)"
 
@@ -31,52 +32,85 @@ Generate a concise, human-readable summary of an OpenSpec change.
    - `proposal.md` — motivation, goals, non-goals
    - `design.md` — approach, key decisions, trade-offs
    - `tasks.md` — implementation checklist
-   - `specs/` — delta spec files
+   - `plan.md` — execution plan (when present)
+   - `specs/` — delta spec files (capabilities added or modified)
 
-3. **Produce the Change Summary**
+3. **Collect silent-decision markers**
+
+   From each artifact above, extract the `## Decisions made without
+   consultation` section (if present). Also collect from any PR bodies opened
+   for this change. Discover PR URLs by:
+
+   ```bash
+   gh pr list --search "<change-name>" --state all --json url,body,title --limit 10
+   ```
+
+   For each candidate PR (title or body references the change name), pull the
+   body via `gh pr view <url> --json body --jq .body` and extract its
+   `## Decisions made without consultation` section.
+
+   Deduplicate entries by decision text (case-insensitive trim). Preserve
+   source attribution — group results by source artifact / PR URL when writing
+   them out. If no marker sections were found anywhere, omit the section
+   entirely from `summary.md` (no empty placeholder, no "N/A").
+
+4. **Produce the Change Summary**
+
+   Output a structured summary using this format:
 
    ```
    ## Change Summary: <change-name>
 
    ### What Was Built
-   <2-3 sentences. Plain language.>
+   <2-3 sentences describing what was implemented. Plain language, no jargon.>
 
    ### Why
-   <1-2 sentences on the motivation from the proposal.>
+   <1-2 sentences on the motivation or business goal from the proposal.>
 
    ### Key Decisions
    - <decision 1 — what was chosen and the key trade-off>
    - <decision 2>
    - <decision 3>
-   (3-5 decisions maximum)
+   (3-5 decisions maximum, sourced from design.md)
 
    ### Spec Changes
-   - **<capability-name>**: <added / modified / removed>
-   (skip if no delta specs)
+   - **<capability-name>**: <what changed — added / modified / removed>
+   (list only capabilities with delta specs; skip if no delta specs exist)
 
    ### Tasks Completed
    **<N>/<M> tasks complete**
-   - <task group 1>
-   - <task group 2>
+   - <task group or category 1>
+   - <task group or category 2>
+   (group by section if tasks.md has sections; list individual tasks if fewer than 8 total)
+
+   ### Decisions made without consultation
+   <!-- Include this section ONLY when at least one marker entry was collected
+        in step 3. Group by source artifact / PR URL. Within each group, list
+        each deduplicated decision as a bullet preserving the decision /
+        alternative / rationale shape from the source. -->
+   **From `proposal.md`**
+   - <decision — alternative — rationale>
+   **From `design.md`**
+   - <decision — alternative — rationale>
+   **From PR <url>**
+   - <decision — alternative — rationale>
    ```
 
-4. **Write `summary.md` and print to terminal**
+5. **Write `summary.md` and print to terminal**
 
-   Write the summary to two locations:
-
-   **a) Change archive folder:**
+   Write the summary to the change folder alongside the other artifacts:
    ```
    <change-path>/summary.md
    ```
 
-   **b) Each affected main spec folder** — for every capability with a delta spec:
+   Overwrite any existing `summary.md` without prompting — it is always regenerated from current artifact state.
+
+   After writing, announce the location:
    ```
-   openspec/specs/<capability>/summary.md
+   Summary written to: <change-path>/summary.md
    ```
 
-   Overwrite any existing `summary.md` without prompting.
-
-   Announce each location written, then print the summary to the terminal.
+   Then print the summary to the terminal.
 
 **Guardrails**
 - If no change is found, report clearly and exit

@@ -1,9 +1,11 @@
 ---
 name: "OPSX: Archive"
-description: Archive a completed change in the experimental workflow
+description: Archive a completed change in the experimental workflow. Use when the user wants to finalize and archive a change after implementation is complete.
 category: Workflow
 tags: [workflow, archive, experimental]
 ---
+
+<!-- generated from templates/opsx/archive.md — do not edit -->
 
 Archive a completed change in the experimental workflow.
 
@@ -98,7 +100,7 @@ Archive a completed change in the experimental workflow.
 
    Read `openspec/config.yaml`. If a `hooks.post-archive` list exists, execute each entry in order.
 
-   For `/opsx:summarize`: use the **Skill tool** to invoke `opsx:summarize`, passing the archived change name. Show the summary output inline below the archive completion summary.
+   For `/opsx:summarize`: invoke the summarize workflow (Claude: use the **Skill tool** to invoke `opsx:summarize`; other tools: invoke the equivalent slash command), passing the archived change name. Show the summary output inline below the archive completion summary.
 
    If config.yaml cannot be read or no hooks are defined, skip silently.
 
@@ -171,5 +173,5 @@ Target archive directory already exists for this ticket.
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
-- If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
+- If sync is requested, invoke `openspec-sync-specs` (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
