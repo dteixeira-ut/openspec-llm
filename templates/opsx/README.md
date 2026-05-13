@@ -15,20 +15,32 @@ the matching `templates/opsx/<id>.md` and re-run `bin/opsx-sync`.
 > [Tool-agnostic authoring](#tool-agnostic-authoring) before writing or
 > editing a template.
 
+## Prerequisites
+
+- **Node.js 22.6+** — `bin/opsx-sync` is TypeScript with native type
+  stripping. No build step, no `npm install` needed for the generator
+  itself (stdlib only).
+- **`openspec` CLI installed** — the generated workflows shell out to
+  `openspec` for every artifact action (`openspec new change`,
+  `openspec validate`, `openspec status`, `openspec archive`, etc.).
+  Install it once globally with `npm install -g openspec` (or via your
+  team's preferred package manager). Without it the slash commands will
+  fail at the first `openspec …` invocation.
+
 ## Canonical workflow set
 
-| id | command surfaces |
-|---|---|
-| `apply` | `/opsx:apply` |
-| `archive` | `/opsx:archive` |
-| `explore` | `/opsx:explore` |
-| `plan` | `/opsx:plan` |
-| `pr` | `/opsx:pr` |
-| `propose` | `/opsx:propose` |
-| `refine` | `/opsx:refine` |
-| `review` | `/opsx:review` |
-| `suggest` | `/opsx:suggest` |
-| `summarize` | `/opsx:summarize` |
+| id            | command surfaces                 |
+| ------------- | -------------------------------- |
+| `apply`       | `/opsx:apply`                    |
+| `archive`     | `/opsx:archive`                  |
+| `explore`     | `/opsx:explore`                  |
+| `plan`        | `/opsx:plan`                     |
+| `pr`          | `/opsx:pr`                       |
+| `propose`     | `/opsx:propose`                  |
+| `refine`      | `/opsx:refine`                   |
+| `review`      | `/opsx:review`                   |
+| `suggest`     | `/opsx:suggest`                  |
+| `summarize`   | `/opsx:summarize`                |
 | `code-review` | invoked by `apply` on completion |
 
 Adding a new workflow is an OpenSpec change — see "Add a new workflow"
@@ -69,17 +81,36 @@ template's.
 
 ## Per-tool output paths
 
-| Tool | Output |
-|---|---|
-| Claude Code | `.claude/commands/opsx/<id>.md` (nested folder, no prefix) |
-| Cursor | `.cursor/commands/opsx-<id>.md` (flat directory, hyphen prefix) |
-| Codex | `${CODEX_HOME:-$HOME/.codex}/prompts/opsx-<id>.md` (global, matches upstream `openspec init` placement) |
+| Tool        | Output                                                                                                  |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| Claude Code | `.claude/commands/opsx/<id>.md` (nested folder, no prefix)                                              |
+| Cursor      | `.cursor/commands/opsx-<id>.md` (flat directory, hyphen prefix)                                         |
+| Codex       | `${CODEX_HOME:-$HOME/.codex}/prompts/opsx-<id>.md` (global, matches upstream `openspec init` placement) |
 
 Codex output lives **outside the repo** at the user's global Codex prompts
-directory. CI cannot verify Codex outputs — contributors must run
-`bin/opsx-sync` locally after pulling template changes so their global
-Codex prompts stay in sync. See the [CI scope gap](#known-limitations)
-section below.
+directory. This is **deliberate and matches upstream `openspec init`
+exactly** — running `openspec init --tools codex` against a fresh repo
+writes only to `~/.codex/prompts/opsx-*.md` and creates nothing
+project-local. We mirror that behavior to keep this generator a
+drop-in companion to openspec rather than a divergent variant.
+
+**Implications**:
+
+- CI cannot drift-check Codex outputs — contributors must run
+  `bin/opsx-sync` locally after pulling template changes so their global
+  Codex prompts stay in sync.
+- A developer working on multiple repos that consume this generator (or
+  the future `@usertesting/opsx` package) will see their global Codex
+  prompts reflect whichever repo they ran `bin/opsx-sync` in most
+  recently. This is a known consequence of upstream's global-only model.
+- The `.codex/` directory under the repo root is **intentionally absent**
+  for Codex commands. Do not introduce a project-local `.codex/commands/`
+  or `.codex/prompts/` — that would diverge from upstream openspec without
+  changing the underlying resolution behavior (Codex reads from
+  `$CODEX_HOME/prompts/`).
+
+See the [CI scope gap](#known-limitations) section below for the
+mitigation.
 
 ## Recipes
 
@@ -133,13 +164,13 @@ references to Claude-specific tool names (`AskUserQuestion`, `TodoWrite`,
 
 **Replacement recipe**
 
-| Claude-ism | Tool-agnostic replacement |
-|---|---|
-| `use the **AskUserQuestion tool** to ask` (free-form) | `ask the user: "<question>"` |
+| Claude-ism                                                                   | Tool-agnostic replacement                                                                                                         |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `use the **AskUserQuestion tool** to ask` (free-form)                        | `ask the user: "<question>"`                                                                                                      |
 | `use the **AskUserQuestion tool** to let the user select` (discrete options) | prepend `<!-- Claude affordance: use AskUserQuestion with options=[A, B] -->`, then prose `ask the user to choose one of: A or B` |
-| `use the **Skill tool** to invoke <skill-name>` | `invoke the <slash-command-name> workflow` |
-| `use the **TodoWrite tool** to track progress` | `track your progress against the listed steps` |
-| `use ScheduleWakeup` (multi-step Claude-only sub-flow) | wrap in a block-level `<!-- Claude affordance: <short name> ... -->` comment with a tool-agnostic fallback immediately below |
+| `use the **Skill tool** to invoke <skill-name>`                              | `invoke the <slash-command-name> workflow`                                                                                        |
+| `use the **TodoWrite tool** to track progress`                               | `track your progress against the listed steps`                                                                                    |
+| `use ScheduleWakeup` (multi-step Claude-only sub-flow)                       | wrap in a block-level `<!-- Claude affordance: <short name> ... -->` comment with a tool-agnostic fallback immediately below      |
 
 **HTML-comment affordance hints (two shapes)**
 
@@ -147,6 +178,7 @@ references to Claude-specific tool names (`AskUserQuestion`, `TodoWrite`,
 
    ```markdown
    <!-- Claude affordance: use AskUserQuestion with options=[A, B] -->
+
    Ask the user to choose one of: A or B.
    ```
 
