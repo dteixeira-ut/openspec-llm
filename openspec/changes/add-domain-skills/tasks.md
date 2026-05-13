@@ -11,16 +11,16 @@
 
 ## 3. `migrate-to-nestjs` skill body
 
-- [ ] 3.1 Author `skills/migrate-to-nestjs/SKILL.md` with frontmatter (name, description, license, repo-agnostic self-check directive), input/output contract, and step-numbered procedure
-- [ ] 3.2 Step 0: sibling-file inspection — list the file categories from the spec (prettier config, eslint config, tsconfig base + build, test config, Dockerfile, dockerignore, CI workflows, package.json scripts) with the "name categories, not paths" rule
-- [ ] 3.3 Steps 1–N: the migration procedure proven across the prior NestJS migration (foundation first, per-capability slicing, build gates, AppModule bootstrap order, etc.)
-- [ ] 3.4 Include the migration-specific must-ask classes section (library surface mismatch, scenario contradicts legacy, tsconfig.build divergence, dangling Dockerfile CMD, transitive→direct promotion)
-- [ ] 3.5 Include the `## Graduation` section listing graduation triggers for this skill specifically
+- [x] 3.1 Author `skills/migrate-to-nestjs/SKILL.md` with frontmatter (name, description, license, repo-agnostic self-check directive), input/output contract, and step-numbered procedure
+- [x] 3.2 Step 0: sibling-file inspection — list the file categories from the spec (prettier config, eslint config, tsconfig base + build, test config, Dockerfile, dockerignore, CI workflows, package.json scripts) with the "name categories, not paths" rule
+- [x] 3.3 Steps 1–N: the migration procedure proven across the prior NestJS migration (foundation first, per-capability slicing, build gates, AppModule bootstrap order, etc.)
+- [x] 3.4 Include the migration-specific must-ask classes section (library surface mismatch, scenario contradicts legacy, tsconfig.build divergence, dangling Dockerfile CMD, transitive→direct promotion)
+- [x] 3.5 Include the `## Graduation` section listing graduation triggers for this skill specifically
 
 ## 4. `migrate-to-nestjs` recipes
 
-- [ ] 4.1 Write `skills/migrate-to-nestjs/recipes/rebase-stacked-squash.md` containing the verbatim rebase loop (`git fetch`, checkout, rebase, `--ours` resolution rule, `--force-with-lease`) plus the warning that the recipe applies whenever strategy is `per-capability stack` + merge-method is `squash`
-- [ ] 4.2 Write `skills/migrate-to-nestjs/recipes/sibling-file-diff-checklist.md` as a runnable checklist (one bullet per file category) the agent fills in during Step 0
+- [x] 4.1 Write `skills/migrate-to-nestjs/recipes/rebase-stacked-squash.md` containing the verbatim rebase loop (`git fetch`, checkout, rebase, `--ours` resolution rule, `--force-with-lease`) plus the warning that the recipe applies whenever strategy is `per-capability stack` + merge-method is `squash`
+- [x] 4.2 Write `skills/migrate-to-nestjs/recipes/sibling-file-diff-checklist.md` as a runnable checklist (one bullet per file category) the agent fills in during Step 0
 
 ## 5. `service-config-drift` skill body
 
