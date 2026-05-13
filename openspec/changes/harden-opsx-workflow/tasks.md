@@ -41,19 +41,31 @@
 
 ## 6. Living spec for the workflow
 
-- [ ] 6.1 After archive, confirm that `openspec/specs/opsx-workflow/spec.md` and `openspec/specs/opsx-plan-command/spec.md` have been synced from this change's delta specs (the standard archive flow handles this)
-- [ ] 6.2 Verify the spec-drift monitor's gh-aw workflow picks up the new capabilities on the next `main` push by reading `.github/workflows/spec-drift-monitor.md` and confirming it globs `openspec/specs/**/spec.md`
+- [ ] 6.1 After archive, confirm that `openspec/specs/opsx-workflow/spec.md` and `openspec/specs/opsx-plan-command/spec.md` have been synced from this change's delta specs (the standard archive flow handles this) — **DEFERRED to post-archive: cannot verify pre-merge.**
+- [x] 6.2 Verify the spec-drift monitor's gh-aw workflow picks up the new capabilities on the next `main` push by reading `.github/workflows/spec-drift-monitor.md` and confirming it globs `openspec/specs/**/spec.md` — confirmed: monitor lists and reads "all `spec.md` files under `openspec/specs/`" (line 65), so newly synced capabilities are picked up automatically with no workflow edits.
 
 ## 7. Dogfooding validation
 
-- [ ] 7.1 Create a throwaway test change (`openspec new change test-rule-surface`) and verify the new `rules:` block from §1 (including the silent-decisions marker rule from 1.7) surfaces in `openspec instructions proposal --change test-rule-surface --json`
-- [ ] 7.2 Generate the proposal artifact for the throwaway change and confirm the rendered template includes the new sections (Non-code surfaces, Starting state, Cutover); delete the throwaway change after verification
-- [ ] 7.3 Verify the silent-decisions marker rule fires: author a throwaway artifact with a clearly silent decision (e.g. a kebab-case naming choice), run `/opsx:review` against the diff, confirm the "Marker missing" finding when the section is absent and that the finding disappears when the section is added
-- [ ] 7.4 Run `/opsx:plan harden-opsx-workflow` against this change itself (after §5 lands) and verify a sensible `plan.md` is produced
-- [ ] 7.5 Open the PR using the new stacked-mid-implementation mode if applicable, or standard mode otherwise; verify the PR body template includes the `## Decisions made without consultation` section when may-decide calls were logged during this change
+- [x] 7.1 Create a throwaway test change (`openspec new change test-rule-surface`) and verify the new `rules:` block from §1 (including the silent-decisions marker rule from 1.7) surfaces in `openspec instructions proposal --change test-rule-surface --json` — confirmed: 3 rules surfaced including `Non-code surfaces`, `Starting state:`, and the silent-decisions marker. Throwaway deleted.
+- [ ] 7.2 Generate the proposal artifact for the throwaway change and confirm the rendered template includes the new sections (Non-code surfaces, Starting state, Cutover); delete the throwaway change after verification — **DEFERRED**: rules extension is non-templated (agent writes sections at authoring time from the `rules:` array). Verification requires invoking `/opsx:propose` interactively, which is part of the orchestrator's post-merge dogfooding pass; 7.1 confirms the rules surface to the agent.
+- [ ] 7.3 Verify the silent-decisions marker rule fires: author a throwaway artifact with a clearly silent decision (e.g. a kebab-case naming choice), run `/opsx:review` against the diff, confirm the "Marker missing" finding when the section is absent and that the finding disappears when the section is added — **DEFERRED**: requires interactive `/opsx:review` invocation. The agent-facing prompt change is committed in §2.
+- [ ] 7.4 Run `/opsx:plan harden-opsx-workflow` against this change itself (after §5 lands) and verify a sensible `plan.md` is produced — **DEFERRED**: requires interactive `/opsx:plan` invocation; the orchestrator can run this against the merged branch.
+- [ ] 7.5 Open the PR using the new stacked-mid-implementation mode if applicable, or standard mode otherwise; verify the PR body template includes the `## Decisions made without consultation` section when may-decide calls were logged during this change — **DEFERRED to orchestrator**: PR creation is explicitly the orchestrator's job per task brief ("DO NOT open a PR yourself").
 
 ## 8. Decisions made without consultation (this change)
 
-- [ ] 8.1 Confirm the proposal-level decisions recorded in `proposal.md`'s `## Decisions made without consultation` section are also present in the PR body when `/opsx:pr` runs
-- [ ] 8.2 Confirm `/opsx:summarize` aggregates the marker sections from `proposal.md`, `design.md`, the two spec files, `tasks.md`, and the PR body into `summary.md` at archive time
-- [ ] 8.3 Add any additional may-decide calls discovered during implementation to the PR body before opening
+- [ ] 8.1 Confirm the proposal-level decisions recorded in `proposal.md`'s `## Decisions made without consultation` section are also present in the PR body when `/opsx:pr` runs — **DEFERRED to orchestrator**: PR creation is the orchestrator's job; the §2.3 `/opsx:summarize` edit harvests these for `summary.md`.
+- [ ] 8.2 Confirm `/opsx:summarize` aggregates the marker sections from `proposal.md`, `design.md`, the two spec files, `tasks.md`, and the PR body into `summary.md` at archive time — **DEFERRED**: verified at the prompt level in §2.3; runtime confirmation occurs at archive.
+- [x] 8.3 Add any additional may-decide calls discovered during implementation to the PR body before opening — implementation-pass decisions are recorded below in this `tasks.md`'s own `## Decisions made without consultation` section; the orchestrator should copy them into the PR body.
+
+## Decisions made without consultation
+
+Recorded per the rule introduced by this change. Each entry: decision — alternative rejected — rationale.
+
+1. **Pre-pass output location** — recorded in a new `## Legacy preservation` section appended to `proposal.md` (alternative: merge into `## Impact`) — rationale: keeps preservation answers grouped and easy to harvest by downstream skills; aligns with how `## Non-code surfaces` and `## Decisions made without consultation` sit as siblings.
+2. **Ambiguity-contract location in skill bodies** — added as an "Ambiguity escalation contract" block in each skill/command prompt that references `openspec/config.yaml` `ambiguity:` (alternative: inline the full lists in every prompt) — rationale: keeps the lists DRY; the config block is the durable contract, prompts cite it.
+3. **Marker-finding severity in `/opsx:review`** — informational by default; flips to `CHANGES REQUESTED` only when the missing marker would mask a **must-ask-class** decision (alternative: always `CHANGES REQUESTED` on missing marker) — rationale: marker is honor-system per design.md Decision 3a trade-off; over-blocking would interrupt momentum on benign may-decide omissions.
+4. **Plan template section names** — `Branch strategy`, `Skill invocations per boundary`, `Stop conditions`, `Rebase recipe`, `Decisions made without consultation` (alternative: copy `## Delivery shape` from `design.md`) — rationale: design.md captures the *intent* at design time; `plan.md` captures the *execution mechanics* and benefits from a dedicated structure surfaced as level-2 headings.
+5. **PR-body marker block heading** — `# Decisions made without consultation` (level-1) matching the existing `# Purpose`/`# Implementation` shape in `/opsx:pr` (alternative: `## ...` level-2 to match artifact bodies) — rationale: keeps PR-body sections at a single heading level for visual consistency.
+6. **`openspec-plan` skill `metadata.generatedBy` field** — set to `"1.2.0"` matching sibling `openspec-*` skills (alternative: bump or omit) — rationale: consistency with the existing skills; the field is informational only.
+7. **Stacked-mode active-change discovery** — read the first entry of `openspec list --changes --json` (alternative: scan `openspec/changes/*` directories) — rationale: the CLI is the canonical list source; if multiple active changes exist the user will already be prompted by upstream `/opsx:apply` / `/opsx:pr` selection.
