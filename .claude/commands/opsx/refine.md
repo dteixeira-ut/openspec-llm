@@ -137,9 +137,26 @@ Track separately:
 Resume /opsx:apply (or /opsx:archive if everything is complete).
 ```
 
+**Ambiguity escalation contract (refine-time)**
+
+Spec edits during refine are themselves frequently must-ask: they change the
+contract downstream agents are coded against. Apply the two-class contract
+from `openspec/config.yaml` `ambiguity:` and the `opsx-workflow` living spec:
+
+- **Must-ask classes** — escalate before editing. At refine-time the
+  hot-spot classes are: conflict between spec scenario wording and legacy
+  code on a brownfield change, library-vs-spec surface mismatches, and any
+  choice between two equally-plausible WHEN/THEN interpretations.
+- **May-decide classes** — proceed and record the call in a
+  `## Decisions made without consultation` section appended to the delta
+  spec file you modified (or `tasks.md` if you adjust tasks during refine).
+
+The marker section is omitted entirely when no may-decide calls were made.
+
 **Guardrails**
 
 - Operate ONLY on active changes — NEVER modify `openspec/specs/` or `openspec/changes/archive/`, and NEVER create a new change. If the issue is out of scope, exit and let the user invoke `/opsx:propose`.
+- Apply the ambiguity contract above when editing delta specs or code.
 - NEVER create new tasks in `tasks.md` for the refinement — the fix happens now.
 - If a requirement was ADDED in this change, edit the ADDED block in place — do not create a duplicate MODIFIED block.
 - Keep code changes minimal — fix the issue, nothing more.

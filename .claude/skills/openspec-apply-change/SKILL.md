@@ -138,10 +138,32 @@ All tasks complete! Ready to archive this change.
 What would you like to do?
 ```
 
+**Ambiguity escalation contract (apply-time)**
+
+The two-class contract defined in `openspec/config.yaml` `ambiguity:` and the
+`opsx-workflow` living spec applies to every implementation-time choice:
+
+- **Must-ask classes** — stop and escalate. The full list lives in
+  `openspec/config.yaml`. At apply-time these surface most often as:
+  library-vs-spec surface mismatches (the spec calls a method the library does
+  not expose), deletion of files not listed in `tasks.md`, promotion of
+  transitive dependencies to direct, and any choice between two
+  equally-plausible WHEN/THEN interpretations.
+- **May-decide classes** — proceed with a reasonable default AND record the
+  decision in the relevant artifact's `## Decisions made without
+  consultation` section. If apply touches `tasks.md`, `proposal.md`,
+  `design.md`, a delta spec, or `plan.md`, the marker section is the right
+  home. If apply only touches code and there is no authored artifact in the
+  diff to host the marker, log the call in the PR body when `/opsx:pr` runs.
+
+The marker section is omitted entirely when no may-decide calls were made.
+
 **Guardrails**
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
-- If task is ambiguous, pause and ask before implementing
+- Apply the ambiguity contract: stop on must-ask classes; for may-decide
+  classes proceed and log the call in the relevant artifact's
+  `## Decisions made without consultation` section
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task
 - Update task checkbox immediately after completing each task

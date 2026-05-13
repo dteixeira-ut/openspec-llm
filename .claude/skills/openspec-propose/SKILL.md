@@ -47,7 +47,29 @@ When ready to implement, run /opsx:apply
    - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
    - `artifacts`: list of all artifacts with their status and dependencies
 
-4. **Create artifacts in sequence until apply-ready**
+4. **Legacy gap-analysis pre-pass (brownfield only)**
+
+   After the proposal artifact is drafted (so the `Starting state:` field is
+   set) and before generating `specs/`, inspect the proposal:
+
+   - If `Starting state: greenfield` → SKIP this pre-pass entirely.
+   - If `Starting state: brownfield` → enumerate the legacy files in scope.
+     Sources: the proposal's `## Impact` section, any explicit file references
+     in `## Why` or `## What Changes`, and a `git ls-files` scan of the
+     directories named in scope.
+
+   For each legacy file, prompt the planner (via **AskUserQuestion**):
+
+   > "Legacy file `<path>` — what behavior here must the new implementation
+   > preserve exactly? What may diverge?"
+
+   Record the answers in a `## Legacy preservation` section appended to
+   `proposal.md` (or merged into the `## Impact` section if the planner
+   prefers). The pre-pass blocks `specs/` generation until each in-scope
+   legacy file has either a preservation note or an explicit "no preservation
+   required" annotation.
+
+5. **Create artifacts in sequence until apply-ready**
 
    Use the **TodoWrite tool** to track progress through the artifacts.
 
@@ -79,7 +101,7 @@ When ready to implement, run /opsx:apply
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
-5. **Show final status**
+6. **Show final status**
    ```bash
    openspec status --change "<name>"
    ```
@@ -102,9 +124,33 @@ After completing all artifacts, summarize:
   - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
   - These guide what you write, but should never appear in the output
 
+**Ambiguity escalation contract**
+
+This skill follows the two-class ambiguity contract defined in
+`openspec/config.yaml` under `ambiguity:` and codified in the `opsx-workflow`
+living spec. Read the config block; do not duplicate its contents here.
+
+- **Must-ask classes** — stop and escalate to the user, never decide silently.
+  Examples: conflict between scenario wording and legacy code on a brownfield
+  change; cutover style if not specified; repo merge-method when choosing a
+  stacked-PR delivery shape; deletion of files not explicitly listed in
+  `tasks.md`; promotion of transitive dependencies; library-vs-spec surface
+  mismatches; any choice between two equally-plausible interpretations of a
+  WHEN/THEN scenario.
+- **May-decide classes** — proceed with a reasonable default AND record the
+  decision in the artifact's `## Decisions made without consultation`
+  section (see the silent-decisions marker rule in `rules.proposal`,
+  `rules.design`, `rules.specs`, `rules.tasks`). Examples: naming derivations
+  within an established convention; test scaffolding shape when the
+  sibling-service pattern is unambiguous; formatting / lint-clean fixes.
+
+The marker section is omitted entirely when no may-decide calls were made.
+
 **Guardrails**
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
-- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
+- Apply the ambiguity contract above: stop on must-ask classes; for
+  may-decide classes, proceed and log the call in the artifact's
+  `## Decisions made without consultation` section
 - If a change with that name already exists, ask if user wants to continue it or create a new one
 - Verify each artifact file exists after writing before proceeding to next

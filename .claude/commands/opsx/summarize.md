@@ -31,9 +31,29 @@ Generate a concise, human-readable summary of an OpenSpec change.
    - `proposal.md` — motivation, goals, non-goals
    - `design.md` — approach, key decisions, trade-offs
    - `tasks.md` — implementation checklist
+   - `plan.md` — execution plan (when present)
    - `specs/` — delta spec files (capabilities added or modified)
 
-3. **Produce the Change Summary**
+3. **Collect silent-decision markers**
+
+   From each artifact above, extract the `## Decisions made without
+   consultation` section (if present). Also collect from any PR bodies opened
+   for this change. Discover PR URLs by:
+
+   ```bash
+   gh pr list --search "<change-name>" --state all --json url,body,title --limit 10
+   ```
+
+   For each candidate PR (title or body references the change name), pull the
+   body via `gh pr view <url> --json body --jq .body` and extract its
+   `## Decisions made without consultation` section.
+
+   Deduplicate entries by decision text (case-insensitive trim). Preserve
+   source attribution — group results by source artifact / PR URL when writing
+   them out. If no marker sections were found anywhere, omit the section
+   entirely from `summary.md` (no empty placeholder, no "N/A").
+
+4. **Produce the Change Summary**
 
    Output a structured summary using this format:
 
@@ -61,9 +81,21 @@ Generate a concise, human-readable summary of an OpenSpec change.
    - <task group or category 1>
    - <task group or category 2>
    (group by section if tasks.md has sections; list individual tasks if fewer than 8 total)
+
+   ### Decisions made without consultation
+   <!-- Include this section ONLY when at least one marker entry was collected
+        in step 3. Group by source artifact / PR URL. Within each group, list
+        each deduplicated decision as a bullet preserving the decision /
+        alternative / rationale shape from the source. -->
+   **From `proposal.md`**
+   - <decision — alternative — rationale>
+   **From `design.md`**
+   - <decision — alternative — rationale>
+   **From PR <url>**
+   - <decision — alternative — rationale>
    ```
 
-4. **Write `summary.md` and print to terminal**
+5. **Write `summary.md` and print to terminal**
 
    Write the summary to the change folder alongside the other artifacts:
    ```

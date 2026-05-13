@@ -54,7 +54,38 @@ Review implemented code changes and decide whether they are ready to present to 
      - Anti-patterns that will cause maintainability problems
    - **Completeness**: No half-finished implementations, no TODO stubs left in critical paths, no placeholder logic in production code paths
 
-4. **Make the decision**
+4. **Silent-decisions marker check**
+
+   For every agent-authored artifact in the diff (`proposal.md`, `design.md`,
+   `specs/<capability>/spec.md`, `tasks.md`, `plan.md`, PR bodies, `summary.md`),
+   scan the diff for evidence of decisions that were not explicitly ratified by
+   the user in the conversation:
+
+   - Filename, identifier, or section-header choices not named by the user
+   - Default values introduced (e.g. defaulting an intermediate-PR build gate
+     to `lint-only`)
+   - Library, framework, or pattern choice that diverged from — or that was
+     ambiguous in — the planning artifacts
+   - Trade-offs accepted on ambiguous tasks
+
+   If candidates exist AND the artifact has no `## Decisions made without
+   consultation` section, surface a finding:
+
+   ```
+   Marker missing — likely silent decisions detected
+   Artifact: <path>
+   Candidates:
+     - <decision 1>
+     - <decision 2>
+   ```
+
+   The finding is informational unless multiple candidates accumulate; it does
+   NOT by itself flip the decision to `CHANGES REQUESTED`. Use the finding to
+   trigger a follow-up question; flip to `CHANGES REQUESTED` only when the
+   missing marker would mask a must-ask-class decision per
+   `openspec/config.yaml` `ambiguity.must-ask`.
+
+5. **Make the decision**
 
    **APPROVED** when:
    - All completed tasks have visible implementation
@@ -67,7 +98,7 @@ Review implemented code changes and decide whether they are ready to present to 
    - Critical bugs, security vulnerabilities, or broken error handling found
    - Significant scope creep that could introduce regressions
 
-5. **Return a structured result**
+6. **Return a structured result**
 
    ```
    ## Code Review Result

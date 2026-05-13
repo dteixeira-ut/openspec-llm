@@ -9,15 +9,99 @@ schema: spec-driven
 #     We use conventional commits
 #     Domain: e-commerce platform
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+# Per-artifact rules — enforced by `openspec instructions <artifact> --change <name> --json`.
+# The rules below were introduced by the `harden-opsx-workflow` change (RAD-75634)
+# to close planning gaps surfaced by a real-world brownfield migration.
+rules:
+  proposal:
+    - |
+      Include a `## Non-code surfaces` section enumerating each of the following
+      surfaces as a sub-bullet, filled with concrete detail OR marked `N/A` with a
+      one-line reason:
+        - Config load mechanics (file path, env-overlay rules, ConfigMap mount,
+          deployment-time substitution)
+        - Secret sources (environment variables, secret manager, mounted files)
+        - Container/deploy artifacts (Dockerfile entry points, helm charts,
+          argocd-apps definitions)
+        - CI workflow scripts (lint, test, fmt, build, deploy)
+        - Observability endpoints (tracing, logging, dashboards, alerts)
+    - |
+      Include explicit `Starting state:` (`brownfield` | `greenfield`) and
+      `Cutover:` (`greenfield` | `parallel-run` | `strangler` | `in-place`)
+      fields near the top of the proposal. If the planner has not declared
+      these, pause and ask before writing the artifact.
+    - |
+      Any decision made without explicit user consultation MUST be recorded in a
+      `## Decisions made without consultation` section at the bottom of the
+      file. Each entry names the decision, the alternative rejected, and the
+      rationale. Omit the section entirely if no such decisions were made (no
+      empty placeholder, no "N/A").
+  design:
+    - |
+      Include a `## Delivery shape` section capturing:
+        - PR shape (one PR / per-capability stack / per-capability parallel /
+          per-service stack)
+        - Base branch (target main branch, plus any integration branch)
+        - Repo merge-method (`squash` | `merge` | `rebase`) — must match the
+          GitHub repo setting; if combination is `stack + squash`, name the
+          rebase recipe in the section
+        - Named `/opsx:*` skill invocations expected at each boundary
+          (propose-end, capability-start, capability-end, archive), or
+          explicitly note the boundary is skipped
+    - |
+      Any decision made without explicit user consultation MUST be recorded in a
+      `## Decisions made without consultation` section at the bottom of the
+      file. Each entry names the decision, the alternative rejected, and the
+      rationale. Omit the section entirely if no such decisions were made.
+  specs:
+    - |
+      On brownfield changes (per the proposal's `Starting state:` field),
+      include or inherit a precedence note: when scenario wording conflicts
+      with a directive to "match legacy `<file>` exactly," the legacy code is
+      authoritative.
+    - |
+      Any decision made without explicit user consultation MUST be recorded in a
+      `## Decisions made without consultation` section at the bottom of the
+      spec file. Each entry names the decision, the alternative rejected, and
+      the rationale. Omit the section entirely if no such decisions were made.
+  tasks:
+    - |
+      For every task that deletes a file (Dockerfile, package.json entry,
+      helm chart fragment, CI workflow, argocd-apps definition, source entry
+      point), include a companion task that enumerates adjacent references
+      (Dockerfile `CMD`/`ENTRYPOINT`, `package.json` `main`/`bin`, helm
+      `command:` lines, CI workflow scripts, argocd-apps) and requires
+      updating each. A file rename receives the same treatment — references
+      either update in the same task or are explicitly deferred to a named
+      follow-up capability (no "TODO later").
+    - |
+      Any decision made without explicit user consultation MUST be recorded in a
+      `## Decisions made without consultation` section at the bottom of the
+      file. Each entry names the decision, the alternative rejected, and the
+      rationale. Omit the section entirely if no such decisions were made.
+
+# Ambiguity escalation contract — applied by the `propose`, `apply`, `refine`,
+# and `pr` skills. The split was introduced by `harden-opsx-workflow`.
+ambiguity:
+  must-ask:
+    - Conflict between spec scenario wording and legacy code on a brownfield change
+    - Cutover style if not specified in the proposal
+    - Repo merge-method when choosing a stacked-PR delivery shape
+    - Deletion of files not explicitly listed in `tasks.md`
+    - Promotion of transitive dependencies to direct dependencies
+    - Library-vs-spec surface mismatches (spec calls a method the library does not expose)
+    - Any choice between two equally-plausible interpretations of a WHEN/THEN scenario
+  may-decide:
+    - Naming derivations within an established convention
+    - Test scaffolding shape when the sibling-service pattern is unambiguous
+    - Formatting / lint-clean fixes that do not change runtime behavior
+  marker: |
+    Every may-decide call MUST be recorded in a `## Decisions made without
+    consultation` section in the artifact the agent is authoring at the time
+    of the decision (proposal.md, design.md, specs/<capability>/spec.md,
+    tasks.md, plan.md, PR bodies opened via /opsx:pr, summary.md). Each entry
+    names the decision, the alternative rejected, and the rationale. Omit the
+    section entirely if no may-decide calls were made.
 
 # Post-command hooks
 # Commands listed here run automatically after the named lifecycle event.
