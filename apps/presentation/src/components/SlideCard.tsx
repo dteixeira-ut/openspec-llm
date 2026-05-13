@@ -1,4 +1,5 @@
-import type { ContentItem, Slide, SubItem } from '../types'
+import type { ContentItem, Slide, SubItem, Theme } from '../types'
+import { researchCardBackground } from '../decks/research/theme'
 
 function renderWithLink(content: string, link: { label: string; href: string }) {
   const idx = content.indexOf(link.label)
@@ -19,13 +20,51 @@ function renderWithLink(content: string, link: { label: string; href: string }) 
   )
 }
 
-function renderItem(item: ContentItem, index: number) {
+function severityClasses(severity: 'low' | 'medium' | 'high') {
+  // Map severity to existing brand-palette tints (no new colors introduced).
+  switch (severity) {
+    case 'high':
+      return 'border-l-4 border-ut-navy bg-ut-blue-light/60'
+    case 'medium':
+      return 'border-l-4 border-ut-blue bg-ut-blue-light/40'
+    case 'low':
+      return 'border-l-4 border-ut-teal bg-ut-blue-light/20'
+  }
+}
+
+function severityLabel(severity: 'low' | 'medium' | 'high') {
+  return severity.toUpperCase()
+}
+
+function calloutClasses(tone: 'info' | 'warn' | 'evidence') {
+  switch (tone) {
+    case 'evidence':
+      return 'border-l-2 border-ut-teal bg-ut-blue-light/30 text-ut-navy/85'
+    case 'warn':
+      return 'border-l-2 border-ut-navy bg-ut-blue-light/40 text-ut-navy/90'
+    case 'info':
+      return 'border-l-2 border-ut-blue bg-ut-blue-light/20 text-ut-navy/80'
+  }
+}
+
+function calloutLabel(tone: 'info' | 'warn' | 'evidence') {
+  switch (tone) {
+    case 'evidence':
+      return 'Evidence'
+    case 'warn':
+      return 'Watch out'
+    case 'info':
+      return 'Note'
+  }
+}
+
+function renderItem(item: ContentItem, index: number, theme: Theme) {
   switch (item.type) {
     case 'text':
       return (
         <p
           key={index}
-          className="text-gray-600 text-lg leading-relaxed animate-fade-up"
+          className={`${theme.bodyTextClasses} animate-fade-up`}
           style={{ animationDelay: `${100 + index * 60}ms` }}
         >
           {item.content}
@@ -47,7 +86,7 @@ function renderItem(item: ContentItem, index: number) {
           {item.items.map((bullet, i) => (
             <li
               key={i}
-              className="flex items-start gap-3 text-gray-700 text-lg animate-fade-up"
+              className={`${theme.bulletItemClasses} animate-fade-up`}
               style={{ animationDelay: `${120 + i * 70}ms` }}
             >
               <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-br from-ut-blue to-ut-teal" />
@@ -62,7 +101,7 @@ function renderItem(item: ContentItem, index: number) {
           {item.items.map((q, i) => (
             <li
               key={i}
-              className="flex items-start gap-3 text-gray-700 text-lg animate-fade-up"
+              className={`${theme.bulletItemClasses} animate-fade-up`}
               style={{ animationDelay: `${120 + i * 70}ms` }}
             >
               <span className="shrink-0 font-bold text-ut-blue min-w-[1.5rem]">{i + 1}.</span>
@@ -171,30 +210,140 @@ function renderItem(item: ContentItem, index: number) {
           {item.content}
         </p>
       )
+    case 'finding':
+      return (
+        <div
+          key={index}
+          className={`rounded-md p-4 animate-fade-up ${severityClasses(item.severity)}`}
+          style={{ animationDelay: `${140 + index * 60}ms` }}
+        >
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <span className="section-marker">{severityLabel(item.severity)}</span>
+            {item.mitigation && (
+              <a
+                href={item.mitigation.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-ut-blue underline underline-offset-2 hover:text-ut-navy"
+              >
+                mitigated by {item.mitigation.changeName} →
+              </a>
+            )}
+          </div>
+          <p className="font-semibold text-ut-navy text-base md:text-lg leading-snug">
+            {item.title}
+          </p>
+          <p className="text-ut-navy/75 text-sm md:text-base leading-relaxed mt-1">
+            {item.body}
+          </p>
+        </div>
+      )
+    case 'timeline':
+      return (
+        <ol
+          key={index}
+          className="relative border-l-2 border-ut-blue/30 ml-2 space-y-3 animate-fade-up"
+          style={{ animationDelay: `${140 + index * 60}ms` }}
+        >
+          {item.items.map((entry, i) => (
+            <li key={i} className="ml-4 relative">
+              <span className="absolute -left-[1.4rem] top-1.5 h-2.5 w-2.5 rounded-full bg-ut-blue" />
+              <p className="section-marker">{entry.date}</p>
+              <p className="text-ut-navy/80 text-sm md:text-base leading-relaxed">{entry.event}</p>
+            </li>
+          ))}
+        </ol>
+      )
+    case 'diff':
+      return (
+        <div
+          key={index}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-fade-up"
+          style={{ animationDelay: `${140 + index * 60}ms` }}
+        >
+          <div className="rounded-md border border-ut-navy/15 overflow-hidden">
+            <div className="bg-ut-navy/5 px-3 py-1.5">
+              <span className="section-marker">Before</span>
+            </div>
+            <pre className="px-4 py-3 font-mono text-xs md:text-sm text-ut-navy/85 bg-white whitespace-pre-wrap break-words">
+              <code>{item.before}</code>
+            </pre>
+          </div>
+          <div className="rounded-md border border-ut-teal/30 overflow-hidden">
+            <div className="bg-ut-teal/10 px-3 py-1.5">
+              <span className="section-marker">After</span>
+            </div>
+            <pre className="px-4 py-3 font-mono text-xs md:text-sm text-ut-navy bg-white whitespace-pre-wrap break-words">
+              <code>{item.after}</code>
+            </pre>
+          </div>
+        </div>
+      )
+    case 'metric':
+      return (
+        <div
+          key={index}
+          className="inline-flex flex-col items-start rounded-md border border-ut-blue/20 bg-ut-blue-light/30 px-5 py-3 animate-fade-up"
+          style={{ animationDelay: `${140 + index * 60}ms` }}
+        >
+          <span className="section-marker">{item.label}</span>
+          <span className="font-bold text-3xl md:text-4xl text-ut-navy leading-none mt-1">
+            {item.value}
+          </span>
+          {item.subtext && (
+            <span className="text-ut-navy/65 text-xs md:text-sm mt-1.5">{item.subtext}</span>
+          )}
+        </div>
+      )
+    case 'callout':
+      return (
+        <div
+          key={index}
+          className={`rounded-md p-3 md:p-4 animate-fade-up ${calloutClasses(item.tone)}`}
+          style={{ animationDelay: `${140 + index * 60}ms` }}
+        >
+          <span className="section-marker">{calloutLabel(item.tone)}</span>
+          <p className="text-sm md:text-base leading-relaxed mt-1">{item.content}</p>
+        </div>
+      )
   }
 }
 
 interface SlideCardProps {
   slide: Slide
   slideIndex: number
+  theme: Theme
+  variant?: 'default' | 'summary'
 }
 
 const isSkillSlide = (title: string) => title.startsWith('/opsx:')
 
-export function SlideCard({ slide, slideIndex }: SlideCardProps) {
+export function SlideCard({ slide, slideIndex, theme, variant = 'default' }: SlideCardProps) {
   const skill = isSkillSlide(slide.title)
+
+  const padding =
+    variant === 'summary' && theme.summaryVariantClasses
+      ? theme.summaryVariantClasses
+      : theme.cardPaddingClasses
+
+  const headingScale =
+    variant === 'summary' ? 'text-2xl md:text-3xl' : theme.headingScaleClasses
+
+  const cardStyle =
+    theme.name === 'research' ? { backgroundColor: researchCardBackground } : undefined
 
   return (
     <section
       role="region"
       aria-label={slide.title}
       key={slideIndex}
-      className="w-full max-w-4xl rounded-2xl bg-white shadow-2xl overflow-hidden animate-fade-up"
+      className={`${theme.cardClasses} ${theme.cardAnimationClass}`}
+      style={cardStyle}
     >
-      {/* Accent gradient bar */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-ut-navy via-ut-blue to-ut-teal" />
+      {/* Accent strip — gradient bar (workflow) or hand-drawn stroke (research). */}
+      <div className={theme.accentClasses} />
 
-      <div className="p-10 md:p-14 space-y-6">
+      <div className={padding}>
         {skill && (
           <span className="inline-block rounded-md bg-ut-blue-light px-3 py-1 font-mono text-xs font-semibold text-ut-navy tracking-wide animate-fade-up">
             Claude Code skill
@@ -202,17 +351,17 @@ export function SlideCard({ slide, slideIndex }: SlideCardProps) {
         )}
 
         <h1
-          className={`font-bold leading-tight animate-fade-up ${
-            skill
-              ? 'font-mono text-3xl md:text-4xl text-ut-navy'
-              : 'text-3xl md:text-4xl text-ut-navy'
-          }`}
+          className={`${theme.titleClasses} ${
+            skill ? 'font-mono text-3xl md:text-4xl' : headingScale
+          } animate-fade-up`}
           style={{ animationDelay: '40ms' }}
         >
           {slide.title}
         </h1>
 
-        <div className="space-y-5">{slide.body.map((item, i) => renderItem(item, i))}</div>
+        <div className="space-y-5">
+          {slide.body.map((item, i) => renderItem(item, i, theme))}
+        </div>
       </div>
     </section>
   )
