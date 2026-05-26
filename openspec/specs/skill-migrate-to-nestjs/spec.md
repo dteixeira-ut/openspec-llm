@@ -66,7 +66,7 @@ The recipe MUST include:
 
 ### Requirement: The skill SHALL declare graduation criteria specific to itself
 
-`SKILL.md` MUST include an `## Open questions` or `## Graduation` section listing the conditions under which the skill should move out of `openspec-llm`:
+`SKILL.md` MUST include a `## Graduation` section listing the conditions under which the skill should move out of its current incubation home:
 - A second NestJS migration in a different org adopts the skill (multi-author signal)
 - The skill needs fixture repos for CI validation
 - The migration patterns diverge from spec-driven development specifically

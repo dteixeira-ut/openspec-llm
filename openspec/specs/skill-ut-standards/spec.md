@@ -116,7 +116,7 @@ The skill SHALL NOT prescribe an implementation procedure (it is a reference bod
 
 ### Requirement: The skill SHALL declare graduation criteria
 
-`SKILL.md` MUST include an `## Open questions` or `## Graduation` section listing the conditions under which the skill should move out of its current incubation home:
+`SKILL.md` MUST include a `## Graduation` section listing the conditions under which the skill should move out of its current incubation home:
 
 - UserTesting moves the canonical standards into a versioned reference the skill can fetch programmatically (the skill becomes a thin fetcher rather than a snapshot).
 - A second organization mirrors the pattern with its own `<org>-standards` skill, at which point the shape becomes a reusable template (extract a `corp-standards-template` skill).
