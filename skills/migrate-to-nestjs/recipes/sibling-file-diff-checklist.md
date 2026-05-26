@@ -1,6 +1,8 @@
-# Sibling-file diff checklist (Step 0 of `migrate-to-nestjs`)
+# Sibling-file diff checklist (Step 0a of `migrate-to-nestjs`)
 
-Fill this checklist in during Step 0 of the migration. The output is the input to the **reconciliation commit** that lands at the start of the foundation PR.
+This recipe inspects **config-tooling files** (Prettier, ESLint, tsconfig, jest, Dockerfile, CI workflows, `package.json` scripts) in a sibling NestJS reference service and produces a reconciliation commit. See also the companion recipe [`sibling-source-layout-checklist.md`](./sibling-source-layout-checklist.md), which inspects **source conventions** (`src/` layout, module shapes, naming, test layout) and produces a convention manifest. Both recipes run together at Step 0 of the migration.
+
+Fill this checklist in during Step 0a of the migration. The output is the input to the **reconciliation commit** that lands at the start of the foundation PR.
 
 Pick a **sibling reference**: an existing NestJS service in the same org, or a canonical NestJS starter (e.g. `nest new <name>` output) if no sibling exists.
 
