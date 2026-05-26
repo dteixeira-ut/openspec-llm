@@ -1,79 +1,6 @@
-# skill-migrate-to-nestjs Specification
+> **Precedence (brownfield):** This change refines an existing skill body. When the wording of an ADDED or MODIFIED scenario below conflicts with the prior text of `skills/migrate-to-nestjs/SKILL.md` or with an existing recipe under `skills/migrate-to-nestjs/recipes/`, **this change's scenarios are authoritative**. The skill body and recipes will be updated by `/opsx:apply` to match. There is no upstream legacy code to "match exactly" in this change — the skill itself is the artifact.
 
-## Purpose
-TBD - created by archiving change add-domain-skills. Update Purpose after archive.
-## Requirements
-### Requirement: `migrate-to-nestjs` skill SHALL exist at `skills/migrate-to-nestjs/SKILL.md`
-
-A skill named `migrate-to-nestjs` SHALL be present at `skills/migrate-to-nestjs/SKILL.md`, codifying the procedure for migrating a TypeScript backend service to NestJS.
-
-#### Scenario: Skill present
-- **WHEN** the change is merged
-- **THEN** `skills/migrate-to-nestjs/SKILL.md` SHALL exist and SHALL declare repo-agnostic framing per the `domain-skills-home` capability
-
-### Requirement: The skill SHALL prescribe a Step 0 sibling-file inspection
-
-`SKILL.md` MUST direct agents to inspect the following file categories in the migrating service against a sibling reference (existing NestJS service in the same org, or canonical service starter) before authoring any NestJS code:
-
-- Prettier config (`.prettierrc`, `.prettierrc.json`, or `prettier` block in `package.json`)
-- ESLint config (`eslint.config.*`, `.eslintrc.*`)
-- TypeScript config (`tsconfig.json`, `tsconfig.build.json`)
-- Test runner config (`jest.config.*`, `vitest.config.*`)
-- Container artifacts (`Dockerfile`, `.dockerignore`)
-- CI workflows (`.github/workflows/*.yml`)
-- `package.json` scripts block
-
-The inspection SHALL produce one reconciliation commit before any NestJS source file is added. The file-diff inspection is complemented by the sibling-source-layout inspection described in a separate requirement; the two inspections run together at Step 0 with distinct outputs (the file-diff produces a reconciliation commit; the source-layout produces a convention manifest).
-
-#### Scenario: Missing parser plugin in prettier config
-- **WHEN** the sibling reference's prettier config includes `decorators-legacy` in `importOrderParserPlugins` and the migrating service's does not
-- **THEN** the skill SHALL direct the agent to add the plugin entry in the reconciliation commit
-
-#### Scenario: Mismatched Dockerfile copy list
-- **WHEN** the sibling reference's `Dockerfile` copies `tsconfig.build.json` and `nest-cli.json` into the build stage and the migrating service's does not
-- **THEN** the skill SHALL direct the agent to add those copies in the reconciliation commit
-
-#### Scenario: Both inspections run at Step 0
-- **WHEN** Step 0 of the skill runs on a migrating service with a sibling reference
-- **THEN** the file-diff inspection SHALL produce a reconciliation commit AND the source-layout inspection SHALL produce a convention manifest, both as inputs to the foundation PR
-
-### Requirement: The skill SHALL include the stacked-PR rebase recipe
-
-`SKILL.md` MUST reference a recipe at `skills/migrate-to-nestjs/recipes/rebase-stacked-squash.md` that documents how to recover downstream stacked PRs after the parent PR is squash-merged.
-
-The recipe MUST include:
-- The `--ours` vs `--theirs` rule (always `--ours` when resolving conflicts in files owned by an earlier capability)
-- The verbatim command loop (`git fetch`, `git checkout`, `git rebase`, conflict-resolution loop, `git push --force-with-lease`)
-- A warning that the recipe applies whenever delivery shape is `per-capability stack` and repo merge-method is `squash`
-
-#### Scenario: Stacked PR has conflicts after parent squash-merge
-- **WHEN** an orchestrator notes that PR #N+1 has conflicts after PR #N squash-merges into the integration branch
-- **THEN** the orchestrator SHALL follow `skills/migrate-to-nestjs/recipes/rebase-stacked-squash.md` to resolve, not re-derive the resolution
-
-### Requirement: The skill SHALL define migration-specific must-ask classes
-
-`SKILL.md` MUST list ambiguity classes that are must-ask under any NestJS migration, supplementing the general ambiguity contract from the workflow:
-
-- A library method named in the spec does not exist in the installed library version.
-- A spec scenario contradicts behavior in the legacy file the spec references.
-- A `tsconfig.build.json` or `nest-cli.json` setting differs from the sibling reference.
-- The `Dockerfile` `CMD` references a `dist/<x>.js` file whose `src/<x>.ts` source has been deleted by an earlier task.
-- A transitive dependency must be promoted to a direct dependency to keep the build green.
-
-#### Scenario: Library surface mismatch
-- **WHEN** an agent finds the spec calls `Producer.disconnect()` but the installed `@usertestingenterprise/kafka-client` `Producer` interface has no such method
-- **THEN** the agent SHALL stop and ask the user, not silently implement a no-op or rename
-
-### Requirement: The skill SHALL declare graduation criteria specific to itself
-
-`SKILL.md` MUST include an `## Open questions` or `## Graduation` section listing the conditions under which the skill should move out of `openspec-llm`:
-- A second NestJS migration in a different org adopts the skill (multi-author signal)
-- The skill needs fixture repos for CI validation
-- The migration patterns diverge from spec-driven development specifically
-
-#### Scenario: Graduation triggered
-- **WHEN** any graduation condition is met
-- **THEN** maintainers SHALL follow the procedure in `skills/README.md` (copy to new home, leave `MOVED.md` stub)
+## ADDED Requirements
 
 ### Requirement: The skill SHALL accept a structured source-stack descriptor
 
@@ -253,3 +180,37 @@ The skill SHALL also explicitly assert that the source language is TypeScript on
 - **WHEN** a planner invokes the skill on a service written in Python, Go, or Ruby
 - **THEN** the skill SHALL refuse the migration as out-of-scope, citing the deploying organization's Languages choice standardization
 
+## MODIFIED Requirements
+
+### Requirement: The skill SHALL prescribe a Step 0 sibling-file inspection
+
+`SKILL.md` MUST direct agents to inspect the following file categories in the migrating service against a sibling reference (existing NestJS service in the same org, or canonical service starter) before authoring any NestJS code:
+
+- Prettier config (`.prettierrc`, `.prettierrc.json`, or `prettier` block in `package.json`)
+- ESLint config (`eslint.config.*`, `.eslintrc.*`)
+- TypeScript config (`tsconfig.json`, `tsconfig.build.json`)
+- Test runner config (`jest.config.*`, `vitest.config.*`)
+- Container artifacts (`Dockerfile`, `.dockerignore`)
+- CI workflows (`.github/workflows/*.yml`)
+- `package.json` scripts block
+
+The inspection SHALL produce one reconciliation commit before any NestJS source file is added. The file-diff inspection is complemented by the sibling-source-layout inspection described in a separate requirement; the two inspections run together at Step 0 with distinct outputs (the file-diff produces a reconciliation commit; the source-layout produces a convention manifest).
+
+#### Scenario: Missing parser plugin in prettier config
+- **WHEN** the sibling reference's prettier config includes `decorators-legacy` in `importOrderParserPlugins` and the migrating service's does not
+- **THEN** the skill SHALL direct the agent to add the plugin entry in the reconciliation commit
+
+#### Scenario: Mismatched Dockerfile copy list
+- **WHEN** the sibling reference's `Dockerfile` copies `tsconfig.build.json` and `nest-cli.json` into the build stage and the migrating service's does not
+- **THEN** the skill SHALL direct the agent to add those copies in the reconciliation commit
+
+#### Scenario: Both inspections run at Step 0
+- **WHEN** Step 0 of the skill runs on a migrating service with a sibling reference
+- **THEN** the file-diff inspection SHALL produce a reconciliation commit AND the source-layout inspection SHALL produce a convention manifest, both as inputs to the foundation PR
+
+## Decisions made without consultation
+
+- **`MODIFIED Requirements` for the existing Step 0 sibling-file inspection** rather than ADDING a parallel requirement that supersedes it. Alternative — leaving the original requirement unchanged and adding a new "Step 0 also includes source-layout inspection" requirement — rejected because the two inspections are intentionally coordinated (they share the sibling reference and both run at Step 0); a single modified requirement that names both, with the source-layout inspection's full details in its own ADDED requirement, makes the coordination explicit while preserving the original wording's scenarios.
+- **Adopting "deploying organization" framing** for the standards invocation/cross-reference rather than hard-coding "UserTesting" everywhere. Alternative — name UserTesting directly throughout — rejected because the skill is published for cross-org reuse; the framing keeps the requirements portable while still naming the UT Confluence URLs as the canonical example. Consumers outside UT can substitute their own standards skill with the same rule-name vocabulary.
+- **Closed list of descriptor slot values.** Alternative — open-ended slot values with prose validation — rejected because the closed list is the mechanism by which capability derivation becomes auditable. Open values would push the agent back to judgment-based slicing, which is what the descriptor is meant to replace.
+- **The audience-category must-ask is required for any HTTP-flavor migration, including internal services.** Alternative — default to `internal` when not declared — rejected because the audience prefix affects URL routing, gateway behavior, and security policy; silent defaulting could ship a service under the wrong category.
