@@ -4,7 +4,7 @@ description: Audits a TypeScript backend repo for three categories of config dri
 license: MIT
 compatibility: Repo-agnostic. Expects a TS service repo with a package.json. Each auditor self-skips if its precondition isn't met.
 metadata:
-  author: openspec-llm
+  author: usertesting-arch
   version: "1.0"
 ---
 
@@ -119,25 +119,10 @@ Run against a hypothetical service repo that has decorators but no `decorators-l
 
 ## Graduation
 
-This skill should move out of `openspec-llm` when **any** of:
+This skill should move out of its current incubation home when **any** of:
 
 - A fourth auditor is added (signal that the surface is growing beyond hygiene-spot-checks).
 - The auditors need to run as real CI (against fixture repos or against a live repo) rather than agent-interpreted documentation.
 - A second org adopts the skill — at that point a shared org skills repo or plugin makes more sense.
 
-Procedure: follow the graduation steps in [`../README.md`](../README.md#graduation-procedure).
-
-## Open questions
-
-- Should the skill also gate on the `Dockerfile`'s base image version against a sibling reference? Deferred — that's a different category (drift vs. correctness) and would expand scope.
-- Should the report shape be machine-readable JSON in addition to markdown? Deferred until a CI integration forces the question.
-
-## Decisions made without consultation
-
-While authoring this skill body:
-
-1. The report shape is **markdown only**. JSON output was considered and deferred — agents read markdown natively, and no current consumer needs structured output.
-2. The auditor order in Procedure step 2 is `prettierrc → dockerfile → ci-fmt-gate` — chosen because it matches roughly "most local to most cross-cutting" so a reader sees findings in increasing scope. No technical dependency between auditors, so any order would work.
-3. The "skipped" precondition for the whole skill is "no `package.json` at target path" — chose `package.json` as the anchor rather than `node_modules/` because the latter may be absent in a fresh checkout. A more lenient check would accept any TS source tree, but the auditors all depend on `package.json` directly or transitively.
-4. The example invocation uses a fictional repo name `example-service` rather than `enriched-video-uploads-v2` to keep the skill body repo-agnostic per the self-check directive.
-5. The skill is read-only (does not modify the target repo). Auto-fix mode was considered and deferred — confidence in the fixes is high but the consequences of a wrong fix in CI config are non-trivial.
+Procedure: follow the graduation steps in the host repo's skills README.

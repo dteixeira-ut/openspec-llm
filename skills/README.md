@@ -64,14 +64,14 @@ description: One-sentence trigger description (what it does, when to use it).
 license: MIT
 compatibility: <runtime expectations, e.g. "Repo-agnostic; expects a TS service.">
 metadata:
-  author: openspec-llm
+  author: <authoring-team>
   version: "1.0"
 ---
 ```
 
 ### 3. Each skill declares its own graduation triggers
 
-In addition to the global graduation criteria below, each `SKILL.md` includes an `## Open questions` or `## Graduation` section listing the conditions specific to that skill (e.g. "graduates when a second org adopts it"). This puts the exit condition in the artifact itself, so future maintainers don't have to infer it.
+In addition to the global graduation criteria below, each `SKILL.md` includes a `## Graduation` section listing the conditions specific to that skill (e.g. "graduates when a second org adopts it"). This puts the exit condition in the artifact itself, so future maintainers don't have to infer it.
 
 ### 4. Living spec required
 
@@ -100,15 +100,3 @@ A "temporary home" is only useful if there's a credible path out. A skill gradua
 - [`migrate-to-nestjs/`](./migrate-to-nestjs/SKILL.md) — procedure for migrating a TypeScript backend service to NestJS, codifying the Step 0 sibling-file inspection, foundation-first slicing, per-PR build gates, and migration-specific must-ask classes.
 - [`service-config-drift/`](./service-config-drift/SKILL.md) — three auditors that catch config mismatches biting at deploy time: prettier parser plugins, Dockerfile entrypoint references, CI `fmt` gate presence.
 
-## Open questions
-
-- Should this folder live in `openspec-llm` long-term, or should it move out as soon as a third skill arrives? Review at the next 6-month inventory pass.
-- Do we need a registry/index file in addition to this README, or is the README's inventory section enough? Defer until a third skill lands.
-
-## Decisions made without consultation
-
-While authoring this README:
-
-1. Used a markdown table for the `skills/` vs `templates/opsx/` distinction rather than prose — clearer at a glance.
-2. Listed established subfolder names (`recipes/`, `auditors/`, `examples/`) explicitly so future authors don't invent new ones unnecessarily; new names are allowed but should be justified in the skill's own README or commit message.
-3. Set "at least one release cycle" for the `MOVED.md` stub lifetime without defining "release cycle" precisely. Concrete definition deferred until the first graduation event forces the question.
