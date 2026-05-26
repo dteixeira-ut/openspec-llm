@@ -418,18 +418,3 @@ This skill should move out of its current incubation home when **any** of:
 
 Procedure: follow the graduation steps in the host repo's skills README.
 
-## Open questions
-
-- Should the rules carry version stamps tied to Confluence page revisions? Deferred — currently, the entire skill carries a single `version` in frontmatter; per-rule provenance would help diff against Confluence changes but adds maintenance overhead.
-- Should rules referenced by multiple consumer skills carry an "imported by" backlink? Deferred until a second consumer skill (beyond `migrate-to-nestjs`) exists.
-- Should the GraphQL surface (in support of ApolloServer-to-Nest migrations) be encoded with its own rule set here, or in a separate `ut-graphql-standard` skill? Deferred — UT has no published GraphQL standard at this time.
-
-## Decisions made without consultation
-
-While authoring this skill body:
-
-1. **Rule names use kebab-case** (e.g. `error-shape`, `audience-prefix`). Alternative — match the Confluence page's title casing — rejected because rule names are referenced from other SKILL.md files via markdown anchors; kebab-case is the idiomatic anchor format.
-2. **Standards are SNAPSHOTTED into the skill** rather than fetched live from Confluence. Confluence requires authentication (raising the bar for cross-team adoption) and rules change rarely; the staleness risk is mitigated by graduation criteria #1.
-3. **Section per Confluence page** (Framework / REST API / Languages) rather than section per rule type. Mirroring the Confluence structure keeps the skill auditable against the canonical sources.
-4. **No code samples in rule bodies.** Implementation samples belong in consuming skills (e.g. `migrate-to-nestjs`) where they have surrounding context; sample code in a standards body drifts faster than prose rules.
-5. **Scenarios are written in the org-normative voice (`SHALL`)** rather than as suggestions. The standards pages are normative; the scenarios mirror their tone.

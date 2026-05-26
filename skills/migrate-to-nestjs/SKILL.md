@@ -258,19 +258,3 @@ This skill should move out of its current incubation home when **any** of:
 
 Procedure: follow the graduation steps in the host repo's skills README.
 
-## Open questions
-
-- Should the skill prescribe a specific dependency-injection style for tests (`Test.createTestingModule` everywhere vs. plain manual instantiation)? Deferred until a second migration provides a counter-example.
-- Should the per-PR build gate be encoded as a CI matrix entry so it's enforced mechanically? Deferred — currently relies on the orchestrator's discipline.
-- Should the source-stack descriptor be encoded as a fenced YAML block inside the foundation proposal (so an apply-time agent can parse it) or kept as inline prose? Currently inline; revisit if the proposal template grows a dedicated `## Source stack` section.
-
-## Decisions made without consultation
-
-While authoring this skill body:
-
-1. The library choices listed in Step 1 (`nestjs-pino`, `nestjs-zod`, `@nestjs/microservices`, Drizzle as a canonical ORM example, `dd-trace`) are stated as the **resolved choices** from prior migrations, not as the only valid choices. A future migration may swap any of them based on the source-stack descriptor; the skill names them as defaults rather than mandates.
-2. The build-gate table uses a three-row split (foundation / intermediate / cutover). The foundation row exists because the foundation PR's gate is even narrower — nothing is runnable, so even `lint` is the only check that produces signal.
-3. The AppModule bootstrap order (Step 4) is presented as **a** reliable order, not **the** reliable order. Repos with unusual dependencies may need to deviate; the skill flags this as an open question rather than enforcing it.
-4. Step 0a produces "one reconciliation commit" rather than "one reconciliation PR." A separate PR would surface tooling parity before NestJS code lands, but doubles the PR count. The single-commit-in-foundation-PR shape is the compromise.
-5. Step 0.5 names the standards-loading step explicitly as a numbered step (`Step 0.5`) rather than folding it into Step 0a or Step 0.7. Naming it separately makes the dependency on `ut-standards` audit-visible in the procedure — every reader sees that capability authoring is gated on rule loading.
-6. The descriptor slot list is **closed** (no `other`). Closing the list forces unmapped values into a must-ask; the alternative — open values with prose validation — was rejected because it pushes the agent back to judgment-based slicing, which the descriptor is meant to replace.
