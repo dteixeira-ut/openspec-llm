@@ -16,7 +16,7 @@ description: <one-sentence trigger description>
 license: MIT
 compatibility: UserTesting-specific; consumers outside UT should fork or replace with their own organization's standards skill.
 metadata:
-  author: usertesting-arch
+  author: insight-out
   version: "1.0"
 ---
 ```

@@ -4,7 +4,7 @@ description: Authoritative reference body encoding UserTesting's architecture-st
 license: MIT
 compatibility: UserTesting-specific by design. Consumers outside UT should fork this skill or substitute their own organization's standards skill that uses the same rule-name vocabulary.
 metadata:
-  author: usertesting-arch
+  author: insight-out
   version: "1.0"
 ---
 
@@ -23,7 +23,7 @@ Unlike most skills in this collection, this skill is **intentionally** organizat
 
 - The three Confluence URLs in the sections below.
 - UT-specific resource names in scenarios (e.g. `tests`, `workspaces`, `audiences`, `sessions`).
-- The `usertesting-arch` author value in frontmatter.
+- The `insight-out` author value in frontmatter.
 
 **Portability invariant**: this skill body MUST NOT name the repository that currently hosts it. The skill stays portable so it travels intact when graduated to a new home (a versioned package, an internal UT repo, or a graduated location chosen by maintainers).
 

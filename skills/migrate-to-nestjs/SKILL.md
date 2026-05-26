@@ -4,7 +4,7 @@ description: Procedure for migrating an existing backend service (any source lan
 license: MIT
 compatibility: Repo-agnostic on the source side (any language, any framework). Target side expects an OpenSpec workflow available, npm/pnpm/yarn package manager for the new service, and a CI surface that can run lint and tests on PRs.
 metadata:
-  author: usertesting-arch
+  author: insight-out
   version: "1.2"
 ---
 

@@ -4,7 +4,7 @@ description: Audits a TypeScript backend repo for three categories of config dri
 license: MIT
 compatibility: Repo-agnostic. Expects a TS service repo with a package.json. Each auditor self-skips if its precondition isn't met.
 metadata:
-  author: usertesting-arch
+  author: insight-out
   version: "1.0"
 ---
 
