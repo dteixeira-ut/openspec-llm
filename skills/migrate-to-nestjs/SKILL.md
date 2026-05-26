@@ -1,11 +1,11 @@
 ---
 name: migrate-to-nestjs
-description: Procedure for migrating an existing TypeScript backend service (Express, hapi, Mali, hand-rolled @grpc/grpc-js, or ApolloServer) to NestJS as a from-scratch rewrite. Use when a service has chosen NestJS as its target framework and needs a stacking workflow proven across a real migration.
+description: Procedure for migrating an existing backend service (any source language or framework) to NestJS as a from-scratch rewrite. The TARGET is always TS/Node + NestJS; the SOURCE is agnostic. Use when a team has chosen NestJS as the target framework and needs a stacking workflow proven across a real migration.
 license: MIT
-compatibility: Repo-agnostic. Expects a TS service repo with an OpenSpec workflow available, npm/pnpm/yarn package manager, and a CI surface that can run lint and tests on PRs.
+compatibility: Repo-agnostic on the source side (any language, any framework). Target side expects an OpenSpec workflow available, npm/pnpm/yarn package manager for the new service, and a CI surface that can run lint and tests on PRs.
 metadata:
   author: usertesting-arch
-  version: "1.1"
+  version: "1.2"
 ---
 
 # `migrate-to-nestjs`
@@ -25,15 +25,9 @@ If you are about to write a path that only exists in one repo, replace it with t
 
 Use when **all** of the following are true:
 
-- Target codebase is an existing Node.js TypeScript backend service. The source language MUST be TypeScript on Node.js — per the deploying organization's languages standardization, TypeScript/Node.js is the ADOPT general-purpose language. Migrations from other source languages are out of scope.
-- Current framework is one of the legacy backend frameworks on the deploying organization's HOLD list and eligible for Nest.js migration. For UserTesting (per the Framework Standardization page) this is:
-  - Express (HTTP)
-  - hapi (HTTP)
-  - Mali (gRPC)
-  - hand-rolled `@grpc/grpc-js` (grpcServer)
-  - ApolloServer (GraphQL)
+- An existing backend service is being **rewritten from scratch** onto NestJS. The TARGET is always TS/Node + NestJS (per the deploying organization's languages standardization, TS/Node is ADOPT general-purpose). The SOURCE — language, framework, runtime — is **agnostic**. The source MAY be on the deploying organization's HOLD list (UT examples: Express, hapi, Mali, hand-rolled `@grpc/grpc-js`, ApolloServer); it may also be a non-Node service (Rails, Django, Spring, Sinatra, raw Java/Kotlin, Go, etc.) when the team's broader strategy is to consolidate onto TS/Node + NestJS.
 - The task is a **from-scratch rewrite** onto NestJS — not a strangler/partial migration.
-- An OpenSpec workflow is available in the repo so capabilities can be stacked.
+- An OpenSpec workflow is available in the target repo so capabilities can be stacked.
 
 Do **not** use this skill for:
 
@@ -41,7 +35,8 @@ Do **not** use this skill for:
 - Frontend apps or libraries.
 - Greenfield NestJS projects (no migration involved).
 - Partial or strangler migrations where the legacy service keeps running alongside the new one.
-- Migrations from non-TypeScript source languages.
+
+> **Source-side agnosticism.** Several inspection steps below (Step 0a, Step 0b) inspect TS/Node-specific files like `.prettierrc`, `tsconfig.json`, and `src/` layout. Those steps are **skipped** when the source is non-TS/Node — the foundation PR uses NestJS docs defaults for the missing tooling. The rest of the procedure (`Step 0.5` standards invocation, capability derivation, foundation PR shape, build gate, AppModule order, stacked-PR mechanics) applies regardless of source.
 
 ## Inputs
 
@@ -52,18 +47,20 @@ Do **not** use this skill for:
 
 ### Source-stack descriptor
 
-The skill consumes a fixed-shape descriptor that drives capability slicing. Each slot is optional; values are drawn from a **closed list**:
+The skill consumes a fixed-shape descriptor that drives capability slicing. Each slot is optional; values are drawn from a **closed list** of TS/Node-centric examples. For non-Node sources (Rails, Django, Spring, Sinatra, etc.) the slot **semantics** still apply (does the source have HTTP routes? RPC methods? a relational ORM? a queue consumer? input validation?), even though the framework name is not in the closed list.
 
 ```yaml
 sourceStack:
-  http:      express | fastify | koa | hapi | apollo-server | none
-  rpc:       grpc-js | mali | none
-  orm:       drizzle | typeorm | prisma | knex | none
-  queue:     kafka | sqs | rabbitmq | none
-  validator: zod | class-validator | joi | none
+  http:      express | fastify | koa | hapi | apollo-server | none | other  # other = non-Node HTTP framework
+  rpc:       grpc-js | mali | none | other                                  # other = non-Node RPC framework
+  orm:       drizzle | typeorm | prisma | knex | none | other               # other = non-Node ORM (e.g. ActiveRecord, JPA)
+  queue:     kafka | sqs | rabbitmq | none | other
+  validator: zod | class-validator | joi | none | other
 ```
 
-If the planner needs to use a value not in this closed list (for example, `http: mercurius`, `orm: mongoose`, or `queue: bull`), the skill MUST STOP and surface a must-ask "descriptor slot `<slot>` value `<value>` is not in the closed list — extend the list or use a documented value." Do not improvise mappings.
+When a slot value is `other`, the planner SHALL annotate the descriptor with a free-text note naming the actual source framework (e.g. `http: other  # Rails 7 ActionController`). The capability derivation table below uses the **slot presence**, not the value, to derive the foundation capability set — so non-Node sources receive the same NestJS foundation as Node sources with equivalent capability shape.
+
+If the planner encounters a value not in this list and not labelled `other` (for example, typing `http: mercurius` directly), the skill SHALL surface a must-ask "extend the closed list or use `other` with an annotation."
 
 ### `referenceCodebase` (optional)
 
@@ -85,7 +82,9 @@ The warning informs the team of the tradeoff but does NOT block the migration. T
 
 ## Procedure
 
-### Step 0a — Sibling-file inspection (config tooling)
+### Step 0a — Sibling-file inspection (config tooling) — TS/Node sources only
+
+**Applies when**: the source service is on TS/Node. **Skipped when**: the source is non-TS/Node (the foundation PR uses NestJS docs defaults for tooling; document this in the proposal).
 
 Before authoring **any** NestJS source code, inspect the migrating service's configuration files against a sibling reference (or a `nest new` canonical starter if no sibling was supplied). The goal is a single **reconciliation commit** that fixes config drift so subsequent NestJS work isn't blocked by tooling surprises.
 
@@ -101,7 +100,9 @@ Inspect these file categories (paths vary by repo):
 
 The full checklist lives at [`recipes/sibling-file-diff-checklist.md`](./recipes/sibling-file-diff-checklist.md). Output: one reconciliation commit before any NestJS source files are added.
 
-### Step 0b — Sibling source-layout inspection (conventions)
+### Step 0b — Sibling source-layout inspection (conventions) — TS/Node sources only
+
+**Applies when**: the source service is on TS/Node AND a sibling NestJS reference is supplied. **Skipped when**: the source is non-TS/Node OR no sibling reference is available (when only the sibling is missing, the inspection still records "NestJS docs defaults" entries in the convention manifest; when the source itself is non-TS/Node, the convention manifest is skipped entirely and the foundation follows NestJS docs defaults).
 
 In parallel with Step 0a, inspect the sibling reference's **source conventions** — the items that determined retrofit cycles on past migrations when left implicit:
 
@@ -229,7 +230,7 @@ For HTTP-flavor migrations (when `sourceStack.http` is populated with any non-`n
 
 For RPC-flavor migrations (when `sourceStack.rpc` is populated), the same rule names apply where they translate (error shape, ID format, content type at the gRPC boundary).
 
-For migrations from non-TypeScript source languages, the skill cites `ut-standards`' `typescript-node-is-adopt-general-purpose` rule and refuses the migration as out-of-scope.
+The TARGET language for any migration is TS/Node per `ut-standards`' `typescript-node-is-adopt-general-purpose` rule. The SOURCE language is unconstrained — the skill accepts migrations from any language and framework (Rails, Django, Spring, Sinatra, Go, etc.) as long as the team's strategy is to consolidate onto TS/Node + NestJS.
 
 **Portability**: an external consumer (outside UserTesting) substitutes `ut-standards` with their organization's equivalent standards skill, and both the Step 0.5 invocation and the rule-name references in this section continue to resolve provided the substitute skill uses the same rule-name vocabulary.
 

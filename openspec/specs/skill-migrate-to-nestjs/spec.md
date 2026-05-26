@@ -192,7 +192,7 @@ The rule names that apply to NestJS HTTP-flavor migrations (when the descriptor'
 - `monitoring-endpoint` — `GET /<resourceType>/{id}/monitor` where applicable.
 - `openapi-spec` — OpenAPI 3.x versioned alongside the URI version.
 
-For NestJS migrations from any source language other than TypeScript/Node.js, the skill SHALL cite `ut-standards`' `typescript-node-is-adopt-general-purpose` rule and refuse the migration as out-of-scope.
+The TARGET language for any migration is TS/Node per `ut-standards`' `typescript-node-is-adopt-general-purpose` rule. The SOURCE language is unconstrained — the skill accepts migrations from any source language and framework (Rails, Django, Spring, Sinatra, Go, etc.) when the team's strategy is to consolidate onto TS/Node + NestJS.
 
 The invocation and cross-reference SHALL be portable: an external consumer (outside UserTesting) can replace `ut-standards` with their organization's equivalent standards skill, and both the invocation step and the rule-name references in `migrate-to-nestjs/SKILL.md` will continue to resolve provided the substitute skill uses the same rule-name vocabulary.
 
@@ -243,13 +243,17 @@ In addition to the must-ask classes already defined for NestJS migrations, `SKIL
 - hand-rolled `@grpc/grpc-js` (grpcServer)
 - ApolloServer (GraphQL)
 
-The skill SHALL also explicitly assert that the source language is TypeScript on Node.js, per the deploying organization's Languages choice standardization page (UserTesting: TypeScript/Node.js is ADOPT general-purpose).
+The skill SHALL assert that the TARGET language is TypeScript on Node.js, per the deploying organization's Languages choice standardization page (UserTesting: TypeScript/Node.js is ADOPT general-purpose). The SOURCE language SHALL NOT be constrained — the skill accepts migrations from any source language and framework when the team's strategy is to consolidate onto TS/Node + NestJS.
 
 #### Scenario: Migration from hapi service
 - **WHEN** a planner invokes the skill with a service whose HTTP framework is hapi
 - **THEN** the skill SHALL accept the migration as in-scope and derive capabilities from `http: hapi`
 
-#### Scenario: Migration from non-Node language
-- **WHEN** a planner invokes the skill on a service written in Python, Go, or Ruby
-- **THEN** the skill SHALL refuse the migration as out-of-scope, citing the deploying organization's Languages choice standardization
+#### Scenario: Migration from non-Node source
+- **WHEN** a planner invokes the skill on a service written in Python, Go, Ruby, Java, Kotlin, or any other non-Node-TS language
+- **THEN** the skill SHALL accept the migration as in-scope; the TS/Node-specific inspection steps (Step 0a sibling-file diff, Step 0b sibling source-layout) SHALL be SKIPPED; the foundation PR SHALL use NestJS documentation defaults for tooling. The remaining procedure (`Step 0.5` standards invocation, capability derivation, foundation shape, build gate, AppModule order, stacked-PR mechanics) SHALL apply identically.
+
+#### Scenario: Source-stack descriptor with `other` value
+- **WHEN** a planner annotates a slot value as `other` for a non-Node framework (e.g. `http: other  # Rails 7 ActionController`)
+- **THEN** the skill SHALL accept the value, use the slot's presence (not its value) to drive capability derivation, and SHALL NOT surface an unmapped-slot must-ask
 
