@@ -41,7 +41,7 @@ The skill SHALL include a self-check section at the top noting that this skill i
 - **HOLD** (eligible for migration to Nest.js, no new projects): Express, hapi, Mali, grpcServer (hand-rolled `@grpc/grpc-js`), ApolloServer (GraphQL).
 - **HOLD** (eligible for migration to React, no new projects): Angular.
 
-The section SHALL include WHEN/THEN scenarios that consuming skills can cite (e.g. by name `nest-is-target-framework`, `legacy-source-is-on-hold`).
+The section SHALL name each rule (e.g. `nest-is-target-framework`, `legacy-source-is-on-hold`) so consuming skills can cite by name. Rule bodies SHALL use direct prose with examples — NOT WHEN/THEN scenarios (which are reserved for OpenSpec specs).
 
 #### Scenario: Scaffolding decision references the framework radar
 - **WHEN** a backend scaffolding skill needs to choose a framework for a new Node.js service
@@ -94,7 +94,7 @@ The section SHALL include WHEN/THEN scenarios that consuming skills can cite (e.
 - **HOLD**: Ruby, Scala, Java, Clojure.
 - **ADOPT (area-specific)**: Python (data/ML), Swift (iOS), Kotlin (Android).
 
-The section SHALL include WHEN/THEN scenarios consumers can cite.
+Rule bodies SHALL use direct prose with examples — NOT WHEN/THEN scenarios.
 
 #### Scenario: Backend scaffolding language choice
 - **WHEN** a backend scaffolding skill chooses a language for a new general-purpose service
