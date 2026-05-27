@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
 /**
- * LandingPage — root entry point for the presentation app. Renders three cards
- * (Workflow, Research, Package Extraction) plus a one-paragraph framing block.
+ * LandingPage — root entry point for the presentation app. Renders four cards
+ * (Workflow, Research, Package Extraction, Migrate to NestJS) plus a one-paragraph
+ * framing block.
  *
  * Clicking a deck card triggers a "hero zoom": the card scales up toward the
  * centre of the viewport and fades out while the backdrop deepens to navy,
@@ -94,21 +95,22 @@ export function LandingPage() {
       }`}
     >
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-4 py-14 gap-10">
-        <header className="w-full max-w-5xl text-center space-y-3 animate-fade-up">
+        <header className="w-full max-w-6xl text-center space-y-3 animate-fade-up">
           <p className="section-marker text-white/50">OpenSpec + Claude</p>
           <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">
-            Three decks. One workflow.
+            Four decks. One workflow.
           </h1>
           <p className="text-white/70 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             The pitch, the case study, and what&apos;s next. The workflow deck explains how
             spec-driven development with Claude is meant to work. The research deck shows
             what happened when we ran it against a real two-service NestJS migration. The
             package-extraction deck pitches the next phase: shipping the workflow as a
-            versioned npm package consuming repos can pin.
+            versioned npm package consuming repos can pin. The migrate-to-nestjs deck is
+            the procedural skill extracted from the case study — the reusable artifact.
           </p>
         </header>
 
-        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           <a
             href="#/workflow"
             onClick={handleDeckClick}
@@ -183,6 +185,29 @@ export function LandingPage() {
               </p>
               <p className="text-ut-blue text-sm font-semibold mt-3 group-hover:underline">
                 Open package-extraction deck →
+              </p>
+            </div>
+          </a>
+
+          <a
+            href="#/nestjs-demo"
+            onClick={handleDeckClick}
+            className="group rounded-2xl bg-white shadow-2xl overflow-hidden animate-fade-up hover:-translate-y-0.5 transition-transform"
+          >
+            <div className="h-1.5 w-full bg-ut-navy" />
+            <div className="p-8 space-y-3">
+              <p className="section-marker">Deck 4</p>
+              <h2 className="text-2xl font-bold text-ut-navy leading-tight">
+                Migrate to NestJS
+              </h2>
+              <p className="text-gray-600 text-base leading-relaxed">
+                The skill: a ~7-slide walkthrough of <code className="text-sm">migrate-to-nestjs</code>,
+                the procedure extracted from the two-service migration. Provenance, the two
+                open integration PRs, the build gate that surprised everyone, and what&apos;s
+                portable now.
+              </p>
+              <p className="text-ut-blue text-sm font-semibold mt-3 group-hover:underline">
+                Open migrate-to-nestjs deck →
               </p>
             </div>
           </a>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export type Deck = 'workflow' | 'research' | 'landing' | 'package-extraction'
+export type Deck = 'workflow' | 'research' | 'landing' | 'package-extraction' | 'nestjs-demo'
 export type Density = 'full' | 'summary'
 
 export type Route = {
@@ -17,6 +17,7 @@ export type Route = {
  *  - `#/research`                              -> { deck: 'research', density: 'full' }
  *  - `#/research/summary`                      -> { deck: 'research', density: 'summary' }
  *  - `#/package-extraction`                    -> { deck: 'package-extraction', density: 'full' }
+ *  - `#/nestjs-demo`                            -> { deck: 'nestjs-demo', density: 'full' }
  *
  * Density is irrelevant for non-research decks but is set to `'full'` for type completeness.
  */
@@ -34,6 +35,7 @@ function parseHash(hash: string): Route {
     return { deck: 'research', density: 'full' }
   }
   if (first === 'package-extraction') return { deck: 'package-extraction', density: 'full' }
+  if (first === 'nestjs-demo') return { deck: 'nestjs-demo', density: 'full' }
 
   return { deck: 'landing', density: 'full' }
 }
