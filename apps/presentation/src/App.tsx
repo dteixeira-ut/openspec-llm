@@ -7,6 +7,8 @@ import { researchSlides } from './decks/research/slides'
 import { researchTheme } from './decks/research/theme'
 import { packageExtractionSlides } from './decks/package-extraction/slides'
 import { packageExtractionTheme } from './decks/package-extraction/theme'
+import { nestjsDemoSlides } from './decks/nestjs-demo/slides'
+import { nestjsDemoTheme } from './decks/nestjs-demo/theme'
 
 export default function App() {
   const route = useHashRoute()
@@ -21,6 +23,10 @@ export default function App() {
 
   if (route.deck === 'package-extraction') {
     return <DeckView slides={packageExtractionSlides} theme={packageExtractionTheme} />
+  }
+
+  if (route.deck === 'nestjs-demo') {
+    return <DeckView slides={nestjsDemoSlides} theme={nestjsDemoTheme} />
   }
 
   // research deck — filter slides by density.
